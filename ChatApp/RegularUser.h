@@ -4,5 +4,5 @@
 
 class RegularUser : public User {
 public:
-	RegularUser(MyString username = "", MyString password = "");
+	RegularUser(const MyString& username = "", const MyString& password = "");
 };

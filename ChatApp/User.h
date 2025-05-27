@@ -8,5 +8,5 @@ private:
 	MyString password;
 	//Add chats
 public:
-	User(MyString username = "", MyString password = "");
+	User(const MyString& username = "", const MyString& password = "");
 };

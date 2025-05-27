@@ -1,5 +1,5 @@
 #include "Admin.h"
 
-Admin::Admin(MyString username, MyString password, int adminId) : User(username, password) {
+Admin::Admin(const MyString& username, const MyString& password, int adminId) : User(username, password) {
 	this->adminId = adminId;
 }

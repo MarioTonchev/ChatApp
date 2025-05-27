@@ -6,5 +6,5 @@ private:
 	int adminId;
 
 public:
-	Admin(MyString username = "", MyString password = "", int adminId);
+	Admin(const MyString& username = "", const MyString& password = "", int adminId);
 };

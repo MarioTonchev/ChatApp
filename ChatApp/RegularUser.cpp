@@ -1,5 +1,5 @@
 #include "RegularUser.h"
 
-RegularUser::RegularUser(MyString username, MyString password) : User(username, password) {
+RegularUser::RegularUser(const MyString& username, const MyString& password) : User(username, password) {
 
 }
