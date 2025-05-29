@@ -4,6 +4,8 @@
 
 using namespace std;
 
+#pragma warning(disable:4996)
+
 Message::Message(const MyString& sender, const MyString& content) {
 	this->sender = sender;
 	this->content = content;

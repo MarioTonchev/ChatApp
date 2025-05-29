@@ -127,7 +127,40 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Admin.cpp" />
+    <ClCompile Include="Chat.cpp" />
     <ClCompile Include="ChatApp.cpp" />
+    <ClCompile Include="FileConstants.cpp" />
+    <ClCompile Include="GroupChat.cpp" />
+    <ClCompile Include="HelperFunctions.cpp" />
+    <ClCompile Include="IndividualChat.cpp" />
+    <ClCompile Include="IOManager.cpp" />
+    <ClCompile Include="Message.cpp" />
+    <ClCompile Include="MyString.cpp" />
+    <ClCompile Include="RegularUser.cpp" />
+    <ClCompile Include="User.cpp" />
+    <ClCompile Include="UserUtils.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Admin.h" />
+    <ClInclude Include="Chat.h" />
+    <ClInclude Include="FileConstants.h" />
+    <ClInclude Include="GroupChat.h" />
+    <ClInclude Include="HelperFunctions.h" />
+    <ClInclude Include="IndividualChat.h" />
+    <ClInclude Include="IOManager.h" />
+    <ClInclude Include="Message.h" />
+    <ClInclude Include="MyString.h" />
+    <ClInclude Include="MyVector.hpp" />
+    <ClInclude Include="RegularUser.h" />
+    <ClInclude Include="User.h" />
+    <ClInclude Include="UserUtils.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="users.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="users.bin" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
