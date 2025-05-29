@@ -2,6 +2,10 @@
 
 Chat::~Chat() {}
 
+int Chat::getChatId() const {
+	return chatId;
+}
+
 const MyVector<User*>& Chat::getParticipants() const {
 	return participants;
 }

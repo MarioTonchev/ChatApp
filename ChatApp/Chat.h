@@ -14,6 +14,7 @@ protected:
 public:
 	virtual void printChat() const = 0;
 	virtual ~Chat();
+	int getChatId() const;
 	const MyVector<User*>& getParticipants() const;
 	const MyVector<Message>& getMessages() const;
 };
