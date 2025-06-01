@@ -17,4 +17,6 @@ public:
 	int getChatId() const;
 	const MyVector<User*>& getParticipants() const;
 	const MyVector<Message>& getMessages() const;
+	void addParticipant(User* user);
+	void addMessage(Message message);
 };

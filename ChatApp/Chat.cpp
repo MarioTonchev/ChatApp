@@ -13,3 +13,11 @@ const MyVector<User*>& Chat::getParticipants() const {
 const MyVector<Message>& Chat::getMessages() const {
 	return messages;
 }
+
+void Chat::addParticipant(User* user) {
+	participants.push_back(user);
+}
+
+void Chat::addMessage(Message message) {
+	messages.push_back(message);
+}
