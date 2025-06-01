@@ -401,3 +401,5 @@ FodyWeavers.xsd
 *.sln.iml
 /ChatApp/users.bin
 /ChatApp/users.txt
+/ChatApp/usersChats.txt
+/ChatApp/chatIds.txt

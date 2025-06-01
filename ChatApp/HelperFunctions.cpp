@@ -22,6 +22,7 @@ void printActions(const MyString& userType) {
 
 	cout << "view-chats" << endl;
 	cout << "select-chat <chatId>" << endl;
+	cout << "create-individual-chat <username>" << endl;
 	cout << "create-group <groupName> <username1> <username2> ...." << endl;
 	cout << "leave-group <chatId>" << endl;
 	cout << "add-to-group <chatId> <username>" << endl;
