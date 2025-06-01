@@ -4,10 +4,9 @@
 
 using namespace std;
 
-GroupChat::GroupChat(int chatId, const MyString& chatName, MyVector<User*> participants) {
+GroupChat::GroupChat(int chatId, const MyString& chatName) {
 	this->chatId = chatId;
 	this->chatName = chatName;
-	this->participants = participants;
 }
 
 const MyString& GroupChat::getChatName() const {
