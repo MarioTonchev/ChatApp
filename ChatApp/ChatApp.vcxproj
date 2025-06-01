@@ -130,6 +130,7 @@
     <ClCompile Include="Admin.cpp" />
     <ClCompile Include="Chat.cpp" />
     <ClCompile Include="ChatApp.cpp" />
+    <ClCompile Include="ChatUtils.cpp" />
     <ClCompile Include="FileConstants.cpp" />
     <ClCompile Include="GroupChat.cpp" />
     <ClCompile Include="HelperFunctions.cpp" />
@@ -144,6 +145,7 @@
   <ItemGroup>
     <ClInclude Include="Admin.h" />
     <ClInclude Include="Chat.h" />
+    <ClInclude Include="ChatUtils.h" />
     <ClInclude Include="FileConstants.h" />
     <ClInclude Include="GroupChat.h" />
     <ClInclude Include="HelperFunctions.h" />
@@ -157,7 +159,9 @@
     <ClInclude Include="UserUtils.h" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="chatIds.txt" />
     <Text Include="users.txt" />
+    <Text Include="usersChats.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="users.bin" />

@@ -75,6 +75,9 @@
     <ClCompile Include="HelperFunctions.cpp">
       <Filter>Source Files\Utilities</Filter>
     </ClCompile>
+    <ClCompile Include="ChatUtils.cpp">
+      <Filter>Source Files\Utilities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MyString.h">
@@ -116,9 +119,18 @@
     <ClInclude Include="HelperFunctions.h">
       <Filter>Header Files\Utilities</Filter>
     </ClInclude>
+    <ClInclude Include="ChatUtils.h">
+      <Filter>Header Files\Utilities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="users.txt">
+      <Filter>Files</Filter>
+    </Text>
+    <Text Include="usersChats.txt">
+      <Filter>Files</Filter>
+    </Text>
+    <Text Include="chatIds.txt">
       <Filter>Files</Filter>
     </Text>
   </ItemGroup>
