@@ -3,6 +3,8 @@
 #include "MyString.h"
 #include "MyVector.hpp"
 #include "Chat.h"
+#include "IndividualChat.h"
+#include "GroupChat.h"
 
 class User {
 protected:
@@ -16,4 +18,7 @@ public:
 	const MyString& getUsername() const;
 	const MyString& getPassword() const;
 	const MyVector<Chat*>& getChats() const;
+	void addChat(Chat*& chat);
+	void viewChats() const;
+	void createIndividualChat(const MyString& username, MyVector<User*>& users, MyVector<Chat*>& chats);
 };
