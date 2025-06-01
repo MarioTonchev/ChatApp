@@ -10,19 +10,23 @@ using namespace std;
 int main()
 {
 	MyVector<User*> users;
+	MyVector<Chat*> chats;
 
 	loadUsers(users);
+	loadChats(chats);
+	loadUserChats(users, chats);
 
 	User* loggedUser = nullptr;
 	MyString command;
 	MyString userType;
 	MyVector<MyString> tokens;
 
+	cout << "Welcome to BlahBlah! To login or register use the following commands:" << endl;
+
 	while (true)
 	{
 		if (!loggedUser)
 		{
-			cout << "Welcome to BlahBlah! To login or register use the following commands:" << endl;
 			cout << "login <username> <password>" << endl;
 			cout << "register <username> <password>" << endl;
 
@@ -43,7 +47,15 @@ int main()
 			command.getline(cin);
 			tokens = command.split(' ');
 
-			if (tokens[0] == "logout")
+			if (tokens[0] == "view-chats")
+			{
+				loggedUser->viewChats();
+			}
+			else if (tokens[0] == "create-individual-chat" && tokens.getSize() >= 2)
+			{
+				loggedUser->createIndividualChat(tokens[1], users, chats);
+			}
+			else if (tokens[0] == "logout")
 			{
 				loggedUser = nullptr;
 				userType = "";
