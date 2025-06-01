@@ -13,6 +13,13 @@ Message::Message(const MyString& sender, const MyString& content) {
 	setCurrentTime();
 }
 
+Message::Message(const MyString& sender, const MyString& content, const MyString& date, const MyString& time) {
+	this->sender = sender;
+	this->content = content;
+	this->dateSent = date;
+	this->timeSent = time;
+}
+
 void Message::setCurrentDate() {
 	time_t t = time(nullptr);
 	tm* now = localtime(&t);

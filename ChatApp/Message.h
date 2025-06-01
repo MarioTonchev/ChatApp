@@ -13,6 +13,7 @@ private:
 	void setCurrentTime();
 public:
 	Message(const MyString& sender = "", const MyString& content = "");
+	Message(const MyString& sender, const MyString& content, const MyString& date, const MyString& time);
 	const MyString& getSender() const;
 	const MyString& getContent() const;
 	const MyString& getDate() const;
