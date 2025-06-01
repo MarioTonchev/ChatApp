@@ -4,10 +4,8 @@
 
 using namespace std;
 
-IndividualChat::IndividualChat(int chatId, User& participant1, User& participant2) {
+IndividualChat::IndividualChat(int chatId) {
 	this->chatId = chatId;
-	participants.push_back(&participant1);
-	participants.push_back(&participant2);
 }
 
 void IndividualChat::printChat() const {

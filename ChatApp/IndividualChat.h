@@ -4,6 +4,6 @@
 
 class IndividualChat : public Chat {
 public:
-	IndividualChat(int chatId, User& participant1, User& participant2);
+	IndividualChat(int chatId);
 	void printChat() const override;
 };
