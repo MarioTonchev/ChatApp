@@ -76,14 +76,25 @@ void saveChatToFile(Chat* chat) {
 	{
 		GroupChat* groupChat = dynamic_cast<GroupChat*>(chat);
 
-		os << "GroupChat" << "|" << groupChat->getChatName() << "|";
+		os << "GroupChat" << "|" << chat->getChatId() << "|"
+			<< groupChat->getChatName() << "|" << groupChat->getRequiresApproval() << "|";
+
+		for (size_t i = 0; i < groupChat->getAdmins().getSize(); i++)
+		{
+			if (i < groupChat->getAdmins().getSize() - 1)
+			{
+				os << groupChat->getAdmins()[i]->getUsername() << ",";
+			}
+			else
+			{
+				os << groupChat->getAdmins()[i]->getUsername() << endl;
+			}
+		}
 	}
 	else
 	{
-		os << "IndividualChat" << "|";
+		os << "IndividualChat" << "|" << chat->getChatId() << endl;
 	}
-
-	os << chat->getChatId() << endl;
 
 	for (size_t i = 0; i < chat->getMessages().getSize(); i++)
 	{
@@ -227,7 +238,7 @@ MyVector<int> getChatIds() {
 
 	return result;
 }
-void loadChats(MyVector<Chat*>& chats) {
+void loadChats(MyVector<Chat*>& chats, MyVector<User*>& users) {
 	MyVector<int> chatIds = getChatIds();
 
 	for (size_t i = 0; i < chatIds.getSize(); i++)
@@ -255,7 +266,16 @@ void loadChats(MyVector<Chat*>& chats) {
 		}
 		else if (tokens[0] == "GroupChat")
 		{
-			chat = new GroupChat(tokens[2].toInt(), tokens[1]);
+			chat = new GroupChat(tokens[1].toInt(), tokens[2], tokens[3].toInt());
+
+			MyVector<MyString> adminsUsernames = tokens[4].split(',');
+
+			for (size_t i = 0; i < adminsUsernames.getSize(); i++)
+			{
+				User* user = findUser(adminsUsernames[i], users);
+
+				dynamic_cast<GroupChat*>(chat)->addAdmin(user);
+			}
 		}
 
 		if (!chat)

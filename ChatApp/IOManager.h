@@ -26,6 +26,5 @@ void loadUsers(MyVector<User*>& users);
 void loadUsersBin(MyVector<User*>& users);
 
 MyVector<int> getChatIds();
-void loadChats(MyVector<Chat*>& chats);
-
+void loadChats(MyVector<Chat*>& chats, MyVector<User*>& users);
 void loadUserChats(MyVector<User*>& users, MyVector<Chat*>& chats);
