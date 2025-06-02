@@ -58,6 +58,12 @@ void User::viewChats() const {
 }
 
 void User::createIndividualChat(const MyString& username, MyVector<User*>& users, MyVector<Chat*>& chats) {
+	if (username == "")
+	{
+		cout << "Username cannot be empty!" << endl;
+		return;
+	}
+
 	if (this->username == username)
 	{
 		cout << "You cannot create a chat with yourself..." << endl;
