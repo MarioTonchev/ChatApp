@@ -6,7 +6,7 @@
 
 using namespace std;
 
-User* findUser(const MyString& username, MyVector<User*>& users) {
+User* findUser(const MyString& username, const MyVector<User*>& users) {
 	User* user = nullptr;
 
 	for (size_t i = 0; i < users.getSize(); i++)

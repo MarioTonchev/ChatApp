@@ -7,7 +7,7 @@
 
 class User;
 
-User* findUser(const MyString& username, MyVector<User*>& users);
+User* findUser(const MyString& username, const MyVector<User*>& users);
 const MyString getUserType(User*& user);
 bool setCurrentUser(const MyString& username, const MyString& password, MyVector<User*>& users, User*& loggedUser);
 void createAccount(const MyString& username, const MyString& password, MyVector<User*>& users);
