@@ -7,16 +7,47 @@ using namespace std;
 GroupChat::GroupChat(int chatId, const MyString& chatName) {
 	this->chatId = chatId;
 	this->chatName = chatName;
+	this->requiresApproval = false;
+}
+
+GroupChat::GroupChat(int chatId, const MyString& chatName, bool approval) {
+	this->chatId = chatId;
+	this->chatName = chatName;
+	this->requiresApproval = approval;
 }
 
 const MyString& GroupChat::getChatName() const {
 	return chatName;
 }
 
+bool GroupChat::getRequiresApproval() const {
+	return requiresApproval;
+}
+
+const MyVector<User*>& GroupChat::getAdmins() const {
+	return admins;
+}
+
+void GroupChat::setApproval(bool approval) {
+	requiresApproval = approval;
+}
+
+void GroupChat::addAdmin(User* user) {
+	admins.push_back(user);
+}
+
 void GroupChat::printChat() const {
+	cout << "Chat " << chatName << ":" << endl;
+
+	if (messages.getSize() == 0)
+	{
+		cout << "No messages yet." << endl;
+		return;
+	}
+
 	for (size_t i = 0; i < messages.getSize(); i++)
 	{
-		cout << messages[i].getDate() << ", " << messages[i].getTime() << " | "
-			<< messages[i].getSender() << ": " << messages[i].getContent() << endl;
+		cout << "[" << messages[i].getSender() << ", " << messages[i].getDate() << " " << messages[i].getTime()
+			<< "] " << messages[i].getContent() << endl;
 	}
 }
