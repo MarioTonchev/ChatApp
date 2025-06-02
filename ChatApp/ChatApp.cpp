@@ -13,7 +13,7 @@ int main()
 	MyVector<Chat*> chats;
 
 	loadUsers(users);
-	loadChats(chats);
+	loadChats(chats, users);
 	loadUserChats(users, chats);
 
 	User* loggedUser = nullptr;
@@ -54,6 +54,20 @@ int main()
 			else if (tokens[0] == "create-individual-chat" && tokens.getSize() >= 2)
 			{
 				loggedUser->createIndividualChat(tokens[1], users, chats);
+			}
+			else if (tokens[0] == "select-chat" && tokens.getSize() == 2)
+			{
+				if (tokens[1] == "")
+				{
+					cout << "Chat id cannot be empty!" << endl;
+					continue;
+				}
+
+				loggedUser->selectChat(tokens[1].toInt(), chats);
+			}
+			else if (tokens[0] == "create-group" && tokens.getSize() >= 3)
+			{
+				loggedUser->createGroupChat(tokens[1], tokens, users, chats);
 			}
 			else if (tokens[0] == "logout")
 			{

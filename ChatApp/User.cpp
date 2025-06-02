@@ -111,3 +111,98 @@ void User::createIndividualChat(const MyString& username, MyVector<User*>& users
 
 	cout << "Chat with id " << chat->getChatId() << " successfully created!" << endl;
 }
+
+void User::selectChat(int chatId, MyVector<Chat*>& chats) {
+	Chat* chat = findChatById(chatId, chats);
+
+	if (!chat)
+	{
+		cout << "Chat with such id does not exist!" << endl;
+		return;
+	}
+
+	User* user = findUser(username, chat->getParticipants());
+
+	if (!user)
+	{
+		cout << "You don't have access to this chat!" << endl;
+		return;
+	}
+
+	chat->printChat();
+
+	cout << "Enter message (type 'cancel' to stop):" << endl;
+
+	MyString command;
+	command.getline(cin);
+
+	if (command != "cancel")
+	{
+		Message message(username, command);
+
+		chat->addMessage(message);
+		saveChatToFile(chat);
+
+		cout << "Message sent successfully!" << endl;
+	}
+}
+
+void User::createGroupChat(const MyString& groupName, MyVector<MyString>& usernames, MyVector<User*>& users, MyVector<Chat*> chats) {
+	Chat* chat = findGroupChatByName(groupName, chats);
+
+	if (chat)
+	{
+		cout << "Chat with this name already exists!" << endl;
+		return;
+	}
+
+	int id = 1;
+
+	for (size_t i = 0; i < chats.getSize(); i++)
+	{
+		if (id <= chats[i]->getChatId())
+		{
+			id = chats[i]->getChatId() + 1;
+		}
+	}
+
+	chat = new GroupChat(id, groupName);
+
+	for (size_t i = 2; i < usernames.getSize(); i++)
+	{
+		if (usernames[i] == username)
+		{
+			cout << "You cannot add yourself!" << endl;
+			return;
+		}
+
+		User* user = findUser(usernames[i], users);
+
+		if (!user)
+		{
+			cout << "One of these users does not exist!" << endl;
+			return;
+		}
+
+		user->addChat(chat);
+		chat->addParticipant(user);
+	}
+
+	this->addChat(chat);
+	chat->addParticipant(this);
+
+	dynamic_cast<GroupChat*>(chat)->addAdmin(this);
+	chats.push_back(chat);
+
+	saveChatToFile(chat);
+	saveChatIdToFile(chat);
+
+	saveUserChatToFile(username, chat->getChatId());
+
+	for (size_t i = 2; i < usernames.getSize(); i++)
+	{
+		saveUserChatToFile(usernames[i], chat->getChatId());
+	}
+
+	cout << "Group chat with name '" << dynamic_cast<GroupChat*>(chat)->getChatName() << "' successfully created!" << endl;
+}

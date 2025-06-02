@@ -19,6 +19,9 @@ public:
 	const MyString& getPassword() const;
 	const MyVector<Chat*>& getChats() const;
 	void addChat(Chat*& chat);
+
 	void viewChats() const;
 	void createIndividualChat(const MyString& username, MyVector<User*>& users, MyVector<Chat*>& chats);
+	void selectChat(int chatId, MyVector<Chat*>& chats);
+	void createGroupChat(const MyString& groupName, MyVector<MyString>& usernames, MyVector<User*>& users, MyVector<Chat*> chats);
 };
