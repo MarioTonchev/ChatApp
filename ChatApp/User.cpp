@@ -147,7 +147,7 @@ void User::selectChat(int chatId, MyVector<Chat*>& chats) {
 	}
 }
 
-void User::createGroupChat(const MyString& groupName, MyVector<MyString>& usernames, MyVector<User*>& users, MyVector<Chat*> chats) {
+void User::createGroupChat(const MyString& groupName, MyVector<MyString>& usernames, MyVector<User*>& users, MyVector<Chat*>& chats) {
 	Chat* chat = findGroupChatByName(groupName, chats);
 
 	if (chat)
@@ -207,7 +207,7 @@ void User::createGroupChat(const MyString& groupName, MyVector<MyString>& userna
 	cout << "Group chat with name '" << dynamic_cast<GroupChat*>(chat)->getChatName() << "' successfully created!" << endl;
 }
 
-void User::leaveGroupChat(int chatId) {
+void User::leaveGroupChat(int chatId, MyVector<Chat*>& chats) {
 	Chat* chat = findChatById(chatId, this->chats);
 
 	if (!chat)
@@ -239,6 +239,17 @@ void User::leaveGroupChat(int chatId) {
 		{
 			chat->getParticipants().remove_at(i);
 		}
+	}
+
+	if (chat->getParticipants().getSize() == 0)
+	{
+		deleteUserChatRelation(username, chatId);
+		
+		cout << "You successfully left chat with id " << chatId << "." << endl;
+		
+		deleteChat(chat, chats);
+
+		return;
 	}
 
 	GroupChat* groupChat = dynamic_cast<GroupChat*>(chat);

@@ -77,7 +77,7 @@ int main()
 					continue;
 				}
 
-				loggedUser->leaveGroupChat(tokens[1].toInt());
+				loggedUser->leaveGroupChat(tokens[1].toInt(), chats);
 			}
 			else if (tokens[0] == "logout")
 			{
