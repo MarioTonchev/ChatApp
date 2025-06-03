@@ -24,7 +24,7 @@ bool GroupChat::getRequiresApproval() const {
 	return requiresApproval;
 }
 
-const MyVector<User*>& GroupChat::getAdmins() const {
+MyVector<User*>& GroupChat::getAdmins() {
 	return admins;
 }
 

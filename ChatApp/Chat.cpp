@@ -6,11 +6,11 @@ int Chat::getChatId() const {
 	return chatId;
 }
 
-const MyVector<User*>& Chat::getParticipants() const {
+MyVector<User*>& Chat::getParticipants() {
 	return participants;
 }
 
-const MyVector<Message>& Chat::getMessages() const {
+MyVector<Message>& Chat::getMessages() {
 	return messages;
 }
 

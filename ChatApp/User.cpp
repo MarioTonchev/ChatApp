@@ -206,3 +206,58 @@ void User::createGroupChat(const MyString& groupName, MyVector<MyString>& userna
 
 	cout << "Group chat with name '" << dynamic_cast<GroupChat*>(chat)->getChatName() << "' successfully created!" << endl;
 }
+
+void User::leaveGroupChat(int chatId) {
+	Chat* chat = findChatById(chatId, this->chats);
+
+	if (!chat)
+	{
+		cout << "You aren't in a group chat with such id!" << endl;
+		return;
+	}
+
+	MyString chatType = getChatType(chat);
+
+	if (chatType != "GroupChat")
+	{
+		cout << "You aren't in a group chat with such id!" << endl;
+		return;
+	}
+
+	for (size_t i = 0; i < this->chats.getSize(); i++)
+	{
+		if (this->chats[i]->getChatId() == chatId)
+		{
+			this->chats.remove_at(i);
+			break;
+		}
+	}
+
+	for (size_t i = 0; i < chat->getParticipants().getSize(); i++)
+	{
+		if (chat->getParticipants()[i]->getUsername() == username)
+		{
+			chat->getParticipants().remove_at(i);
+		}
+	}
+
+	GroupChat* groupChat = dynamic_cast<GroupChat*>(chat);
+
+	for (size_t i = 0; i < groupChat->getAdmins().getSize(); i++)
+	{
+		if (groupChat->getAdmins()[i]->getUsername() == username)
+		{
+			groupChat->getAdmins().remove_at(i);
+		}
+	}
+
+	if (groupChat->getAdmins().getSize() == 0)
+	{
+		groupChat->setApproval(false);
+	}
+
+	saveChatToFile(chat);
+	deleteUserChatRelation(username, chatId);
+
+	cout << "You successfully left chat with id " << chatId << "." << endl;
+}

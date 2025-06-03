@@ -13,7 +13,7 @@ public:
 
 	const MyString& getChatName() const;
 	bool getRequiresApproval() const;
-	const MyVector<User*>& getAdmins() const;
+	MyVector<User*>& getAdmins();
 
 	void setApproval(bool approval);
 	void addAdmin(User* user);

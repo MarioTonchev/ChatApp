@@ -331,3 +331,38 @@ void loadUserChats(MyVector<User*>& users, MyVector<Chat*>& chats) {
 
 	is.close();
 }
+void deleteUserChatRelation(const MyString& username, int chatId) {
+	ifstream is(usersChatsFile);
+
+	if (!is.is_open())
+	{
+		throw invalid_argument("Error: Could not open fil!");
+	}
+
+	ofstream os("temp.txt");
+
+	if (!os.is_open())
+	{
+		throw invalid_argument("Error: Could not open fil!");
+	}
+
+	MyString buffer;
+	while (is.peek() != EOF)
+	{
+		buffer.getline(is);
+		MyVector<MyString> tokens = buffer.split('|');
+
+		if (tokens[0] == username && tokens[1].toInt() == chatId)
+		{
+			continue;
+		}
+
+		os << tokens[0] << "|" << tokens[1] << endl;
+	}
+
+	is.close();
+	os.close();
+
+	remove(usersChatsFile);
+	rename("temp.txt", usersChatsFile);
+}

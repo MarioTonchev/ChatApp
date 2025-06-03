@@ -69,6 +69,16 @@ int main()
 			{
 				loggedUser->createGroupChat(tokens[1], tokens, users, chats);
 			}
+			else if (tokens[0] == "leave-group" && tokens.getSize() == 2)
+			{
+				if (tokens[1] == "")
+				{
+					cout << "Chat id cannot be empty!" << endl;
+					continue;
+				}
+
+				loggedUser->leaveGroupChat(tokens[1].toInt());
+			}
 			else if (tokens[0] == "logout")
 			{
 				loggedUser = nullptr;
