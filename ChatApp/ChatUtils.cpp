@@ -1,7 +1,12 @@
+#include <stdexcept>
+
 #include "ChatUtils.h"
 #include "Chat.h"
 #include "GroupChat.h"
 #include "IndividualChat.h"
+#include "IOManager.h"
+
+using namespace std;
 
 Chat* findChatById(int id, MyVector<Chat*>& chats) {
 	for (size_t i = 0; i < chats.getSize(); i++)
@@ -54,4 +59,25 @@ const MyString getChatType(Chat* chat) {
 	MyString chatType = classType.split(' ')[1];
 
 	return chatType;
+}
+
+void deleteChat(Chat* chat, MyVector<Chat*>& chats) {
+	if (!chat)
+	{
+		throw invalid_argument("Chat cannot be null!");
+	}
+
+	deleteChatIdFromFile(chat->getChatId());
+	deleteChatFromFile(chat->getChatId());
+
+	for (size_t i = 0; i < chats.getSize(); i++)
+	{
+		if (chats[i]->getChatId() == chat->getChatId())
+		{
+			chats.remove_at(i);
+			break;
+		}
+	}
+
+	cout << "Group chat with id " << chat->getChatId() << " was deleted because it had 0 users left!" << endl;
 }
