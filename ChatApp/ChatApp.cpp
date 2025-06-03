@@ -79,6 +79,16 @@ int main()
 
 				loggedUser->leaveGroupChat(tokens[1].toInt(), chats);
 			}
+			else if (tokens[0] == "set-group-admin" && tokens.getSize() >= 3)
+			{
+				if (tokens[1] == "")
+				{
+					cout << "Chat id cannot be empty!" << endl;
+					continue;
+				}
+
+				loggedUser->setGroupAdmin(tokens[1].toInt(), tokens[2]);
+			}
 			else if (tokens[0] == "logout")
 			{
 				loggedUser = nullptr;

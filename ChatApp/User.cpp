@@ -272,3 +272,58 @@ void User::leaveGroupChat(int chatId, MyVector<Chat*>& chats) {
 
 	cout << "You successfully left chat with id " << chatId << "." << endl;
 }
+
+void User::setGroupAdmin(int chatId, const MyString& username) {
+	Chat* chat = findChatById(chatId, this->chats);
+
+	if (!chat)
+	{
+		cout << "You aren't in any group chat with id " << chatId << "." << endl;
+		return;
+	}
+
+	GroupChat* groupChat = dynamic_cast<GroupChat*>(chat);
+
+	if (!groupChat)
+	{
+		cout << "You aren't in any group chat with id " << chatId << "." << endl;
+		return;
+	}
+
+	User* user = findUser(this->username, groupChat->getAdmins());
+
+	if (!user)
+	{
+		cout << "You are not an admin of group chat "
+			<< groupChat->getChatName() << "! Only group admins can make other participants admins." << endl;
+
+		return;
+	}
+
+	if (this->username == username)
+	{
+		cout << "You can't make yourself admin!" << endl;
+		return;
+	}
+
+	user = findUser(username, groupChat->getAdmins());
+
+	if (user)
+	{
+		cout << "User " << username << " is already an admin of group chat '" << groupChat->getChatName() << "'." << endl;
+		return;
+	}
+
+	user = findUser(username, groupChat->getParticipants());
+
+	if (!user)
+	{
+		cout << "User " << username << " is not part of group chat '" << groupChat->getChatName() << "'." << endl;
+		return;
+	}
+
+	groupChat->addAdmin(user);
+	saveChatToFile(groupChat);
+
+	cout << "Successfully made user " << username << " admin of '" << groupChat->getChatName() << "'!" << endl;
+}

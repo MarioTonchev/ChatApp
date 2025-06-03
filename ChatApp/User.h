@@ -26,4 +26,6 @@ public:
 	void selectChat(int chatId, MyVector<Chat*>& chats);
 	void createGroupChat(const MyString& groupName, MyVector<MyString>& usernames, MyVector<User*>& users, MyVector<Chat*>& chats);
 	void leaveGroupChat(int chatId, MyVector<Chat*>& chats);
+
+	void setGroupAdmin(int chatId, const MyString& username);
 };
