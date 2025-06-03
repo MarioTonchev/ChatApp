@@ -25,8 +25,18 @@ const MyVector<Chat*>& User::getChats() const {
 	return chats;
 }
 
-void User::addChat(Chat*& chat) {
+void User::addChat(Chat* chat) {
 	chats.push_back(chat);
+}
+void User::removeChat(Chat* chat) {
+	for (size_t i = 0; i < chats.getSize(); i++)
+	{
+		if (chats[i]->getChatId() == chat->getChatId())
+		{
+			chats.remove_at(i);
+			break;
+		}
+	}
 }
 
 void User::viewChats() const {
@@ -296,7 +306,6 @@ void User::setGroupAdmin(int chatId, const MyString& username) {
 	{
 		cout << "You are not an admin of group chat "
 			<< groupChat->getChatName() << "! Only group admins can make other participants admins." << endl;
-
 		return;
 	}
 
@@ -326,4 +335,54 @@ void User::setGroupAdmin(int chatId, const MyString& username) {
 	saveChatToFile(groupChat);
 
 	cout << "Successfully made user " << username << " admin of '" << groupChat->getChatName() << "'!" << endl;
+}
+
+void User::kickFromGroup(int chatId, const MyString& username) {
+	Chat* chat = findChatById(chatId, this->chats);
+
+	if (!chat)
+	{
+		cout << "You aren't in any group chat with id " << chatId << "." << endl;
+		return;
+	}
+
+	GroupChat* groupChat = dynamic_cast<GroupChat*>(chat);
+
+	if (!groupChat)
+	{
+		cout << "You aren't in any group chat with id " << chatId << "." << endl;
+		return;
+	}
+
+	User* user = findUser(this->username, groupChat->getAdmins());
+
+	if (!user)
+	{
+		cout << "You are not an admin of group chat "
+			<< groupChat->getChatName() << "! Only group admins can kick other participants." << endl;
+		return;
+	}
+
+	if (this->username == username)
+	{
+		cout << "You can't kick yourself!" << endl;
+		return;
+	}
+
+	user = findUser(username, groupChat->getParticipants());
+
+	if (!user)
+	{
+		cout << "User " << username << " is not part of group chat '" << groupChat->getChatName() << "'." << endl;
+		return;
+	}
+
+	user->removeChat(groupChat);
+	groupChat->removeParticipant(user);
+	groupChat->removeAdmin(user);
+
+	saveChatToFile(chat);
+	deleteUserChatRelation(username, chatId);
+
+	cout << "Successfully kicked user " << username << " from group chat '" << groupChat->getChatName() << "'!" << endl;
 }

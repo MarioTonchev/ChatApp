@@ -17,6 +17,7 @@ public:
 
 	void setApproval(bool approval);
 	void addAdmin(User* user);
+	void removeAdmin(User* user);
 
 	void printChat() const override;
 }; 

@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "GroupChat.h"
+#include "User.h"
 
 using namespace std;
 
@@ -34,6 +35,17 @@ void GroupChat::setApproval(bool approval) {
 
 void GroupChat::addAdmin(User* user) {
 	admins.push_back(user);
+}
+
+void GroupChat::removeAdmin(User* user) {
+	for (size_t i = 0; i < admins.getSize(); i++)
+	{
+		if (admins[i]->getUsername() == user->getUsername())
+		{
+			admins.remove_at(i);
+			break;
+		}
+	}
 }
 
 void GroupChat::printChat() const {

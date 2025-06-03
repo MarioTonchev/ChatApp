@@ -19,7 +19,8 @@ public:
 	const MyString& getPassword() const;
 	const MyVector<Chat*>& getChats() const;
 
-	void addChat(Chat*& chat);
+	void addChat(Chat* chat);
+	void removeChat(Chat* chat);
 	void viewChats() const;
 
 	void createIndividualChat(const MyString& username, MyVector<User*>& users, MyVector<Chat*>& chats);
@@ -28,4 +29,5 @@ public:
 	void leaveGroupChat(int chatId, MyVector<Chat*>& chats);
 
 	void setGroupAdmin(int chatId, const MyString& username);
+	void kickFromGroup(int chatId, const MyString& username);
 };

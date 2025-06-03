@@ -1,4 +1,5 @@
 #include "Chat.h"
+#include "User.h"
 
 Chat::~Chat() {}
 
@@ -16,6 +17,17 @@ MyVector<Message>& Chat::getMessages() {
 
 void Chat::addParticipant(User* user) {
 	participants.push_back(user);
+}
+
+void Chat::removeParticipant(User* user) {
+	for (size_t i = 0; i < participants.getSize(); i++)
+	{
+		if (participants[i]->getUsername() == user->getUsername())
+		{
+			participants.remove_at(i);
+			break;
+		}
+	}
 }
 
 void Chat::addMessage(Message message) {

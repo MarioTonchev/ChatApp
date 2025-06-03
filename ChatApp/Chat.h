@@ -21,5 +21,7 @@ public:
 	virtual void printChat() const = 0;
 
 	void addParticipant(User* user);
+	void removeParticipant(User* user);
+
 	void addMessage(Message message);
 };
