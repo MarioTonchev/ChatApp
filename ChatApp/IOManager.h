@@ -29,4 +29,6 @@ MyVector<int> getChatIds();
 void loadChats(MyVector<Chat*>& chats, MyVector<User*>& users);
 void loadUserChats(MyVector<User*>& users, MyVector<Chat*>& chats);
 
+void deleteChatIdFromFile(int chatId);
+void deleteChatFromFile(int chatId);
 void deleteUserChatRelation(const MyString& username, int chatId);

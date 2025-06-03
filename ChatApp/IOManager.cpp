@@ -79,6 +79,11 @@ void saveChatToFile(Chat* chat) {
 		os << "GroupChat" << "|" << chat->getChatId() << "|"
 			<< groupChat->getChatName() << "|" << groupChat->getRequiresApproval() << "|";
 
+		if (groupChat->getAdmins().getSize() == 0)
+		{
+			os << "noadmins" << endl;
+		}
+
 		for (size_t i = 0; i < groupChat->getAdmins().getSize(); i++)
 		{
 			if (i < groupChat->getAdmins().getSize() - 1)
@@ -268,14 +273,17 @@ void loadChats(MyVector<Chat*>& chats, MyVector<User*>& users) {
 		{
 			chat = new GroupChat(tokens[1].toInt(), tokens[2], tokens[3].toInt());
 
-			MyVector<MyString> adminsUsernames = tokens[4].split(',');
-
-			for (size_t i = 0; i < adminsUsernames.getSize(); i++)
+			if (tokens[4] != "noadmins")
 			{
-				User* user = findUser(adminsUsernames[i], users);
+				MyVector<MyString> adminsUsernames = tokens[4].split(',');
 
-				dynamic_cast<GroupChat*>(chat)->addAdmin(user);
-			}
+				for (size_t i = 0; i < adminsUsernames.getSize(); i++)
+				{
+					User* user = findUser(adminsUsernames[i], users);
+
+					dynamic_cast<GroupChat*>(chat)->addAdmin(user);
+				}
+			}		
 		}
 
 		if (!chat)
@@ -297,7 +305,6 @@ void loadChats(MyVector<Chat*>& chats, MyVector<User*>& users) {
 		is.close();
 	}
 }
-
 void loadUserChats(MyVector<User*>& users, MyVector<Chat*>& chats) {
 	ifstream is(usersChatsFile);
 
@@ -330,6 +337,48 @@ void loadUserChats(MyVector<User*>& users, MyVector<Chat*>& chats) {
 	}
 
 	is.close();
+}
+
+void deleteChatIdFromFile(int chatId) {
+	ifstream is(chatIdsFile);
+
+	if (!is.is_open())
+	{
+		throw invalid_argument("Error: Could not open fil!");
+	}
+
+	ofstream os("temp.txt");
+
+	if (!os.is_open())
+	{
+		throw invalid_argument("Error: Could not open fil!");
+	}
+
+	MyString buffer;
+	while (is.peek() != EOF)
+	{
+		buffer.getline(is);
+		
+		if (buffer.toInt() == chatId)
+		{
+			continue;
+		}
+
+		os << buffer << endl;
+	}
+
+	is.close();
+	os.close();
+
+	remove(chatIdsFile);
+	rename("temp.txt", chatIdsFile);
+}
+void deleteChatFromFile(int chatId) {
+	MyString fileName = chatsFile;
+	fileName += chatId;
+	fileName += ".txt";
+
+	remove(fileName.get());
 }
 void deleteUserChatRelation(const MyString& username, int chatId) {
 	ifstream is(usersChatsFile);
