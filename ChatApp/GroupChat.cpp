@@ -29,6 +29,10 @@ MyVector<User*>& GroupChat::getAdmins() {
 	return admins;
 }
 
+MyVector<User*>& GroupChat::getUsersAwaitingApproval() {
+	return awaitingApproval;
+}
+
 void GroupChat::setApproval(bool approval) {
 	requiresApproval = approval;
 }

@@ -133,6 +133,9 @@
     <Text Include="chatIds.txt">
       <Filter>Files</Filter>
     </Text>
+    <Text Include="approvalList.txt">
+      <Filter>Files</Filter>
+    </Text>
   </ItemGroup>
   <ItemGroup>
     <None Include="users.bin">

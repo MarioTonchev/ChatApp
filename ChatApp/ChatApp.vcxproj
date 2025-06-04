@@ -159,6 +159,7 @@
     <ClInclude Include="UserUtils.h" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="approvalList.txt" />
     <Text Include="chatIds.txt" />
     <Text Include="users.txt" />
     <Text Include="usersChats.txt" />

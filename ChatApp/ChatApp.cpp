@@ -89,6 +89,16 @@ int main()
 
 				loggedUser->setGroupAdmin(tokens[1].toInt(), tokens[2]);
 			}
+			else if (tokens[0] == "add-to-group" && tokens.getSize() >= 3)
+			{
+				if (tokens[1] == "")
+				{
+					cout << "Chat id cannot be empty!" << endl;
+					continue;
+				}
+
+				loggedUser->addToGroup(tokens[1].toInt(), tokens[2], users);
+			}
 			else if (tokens[0] == "kick-from-group" && tokens.getSize() >= 3)
 			{
 				if (tokens[1] == "")

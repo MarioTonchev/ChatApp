@@ -131,6 +131,17 @@ void saveUserChatToFile(const MyString& username, int chatId) {
 	os << username << "|" << chatId << endl;
 	os.close();
 }
+void saveUserToApprovalList(const MyString& username, int chatId) {
+	ofstream os(approvalListFile, ios::app);
+
+	if (!os.is_open())
+	{
+		throw invalid_argument("Error: Could not open file!");
+	}
+
+	os << username << "|" << chatId << endl;
+	os.close();
+}
 
 MyString readMyString(ifstream& is) {
 	int len;
@@ -304,6 +315,8 @@ void loadChats(MyVector<Chat*>& chats, MyVector<User*>& users) {
 
 		is.close();
 	}
+
+	loadApprovalList(chats, users);
 }
 void loadUserChats(MyVector<User*>& users, MyVector<Chat*>& chats) {
 	ifstream is(usersChatsFile);
@@ -334,6 +347,41 @@ void loadUserChats(MyVector<User*>& users, MyVector<Chat*>& chats) {
 
 		user->addChat(chat);
 		chat->addParticipant(user);
+	}
+
+	is.close();
+}
+void loadApprovalList(MyVector<Chat*>& chats, MyVector<User*>& users) {
+	ifstream is(approvalListFile);
+
+	if (!is.is_open())
+	{
+		throw invalid_argument("Error: Could not open file!");
+	}
+
+	MyString buffer;
+	while (is.peek() != EOF)
+	{
+		buffer.getline(is);
+		MyVector<MyString> tokens = buffer.split('|');
+
+		User* user = findUser(tokens[0], users);
+		Chat* chat = findChatById(tokens[1].toInt(), chats);
+
+		if (!user)
+		{
+			throw runtime_error("User cannot be null!");
+		}
+
+		if (!chat)
+		{
+			throw runtime_error("Chat cannot be null!");
+		}
+
+		if (GroupChat* groupChat = dynamic_cast<GroupChat*>(chat))
+		{
+			groupChat->getUsersAwaitingApproval().push_back(user);
+		}
 	}
 
 	is.close();
@@ -414,4 +462,39 @@ void deleteUserChatRelation(const MyString& username, int chatId) {
 
 	remove(usersChatsFile);
 	rename("temp.txt", usersChatsFile);
+}
+void deleteUserFromApprovaList(const MyString& username, int chatId) {
+	ifstream is(approvalListFile);
+
+	if (!is.is_open())
+	{
+		throw invalid_argument("Error: Could not open fil!");
+	}
+
+	ofstream os("temp.txt");
+
+	if (!os.is_open())
+	{
+		throw invalid_argument("Error: Could not open fil!");
+	}
+
+	MyString buffer;
+	while (is.peek() != EOF)
+	{
+		buffer.getline(is);
+		MyVector<MyString> tokens = buffer.split('|');
+
+		if (tokens[0] == username && tokens[1].toInt() == chatId)
+		{
+			continue;
+		}
+
+		os << tokens[0] << "|" << tokens[1] << endl;
+	}
+
+	is.close();
+	os.close();
+
+	remove(approvalListFile);
+	rename("temp.txt", approvalListFile);
 }
