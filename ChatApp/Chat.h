@@ -17,6 +17,7 @@ public:
 	int getChatId() const;
 	MyVector<User*>& getParticipants();
 	MyVector<Message>& getMessages();
+	int getMessageCount(const MyString& username);
 
 	virtual void printChat() const = 0;
 

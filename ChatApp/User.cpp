@@ -386,3 +386,47 @@ void User::kickFromGroup(int chatId, const MyString& username) {
 
 	cout << "Successfully kicked user " << username << " from group chat '" << groupChat->getChatName() << "'!" << endl;
 }
+
+void User::checkGroupStats(int chatId) {
+	Chat* chat = findChatById(chatId, this->chats);
+
+	if (!chat)
+	{
+		cout << "You aren't in any group chat with id " << chatId << "." << endl;
+		return;
+	}
+
+	GroupChat* groupChat = dynamic_cast<GroupChat*>(chat);
+
+	if (!groupChat)
+	{
+		cout << "You aren't in any group chat with id " << chatId << "." << endl;
+		return;
+	}
+
+	cout << groupChat->getChatName() << ": " << groupChat->getParticipants().getSize()
+		<< " members, " << groupChat->getMessages().getSize() << " messages";
+
+	if (groupChat->getMessages().getSize() > 0)
+	{
+		MyString topUser = groupChat->getParticipants()[0]->getUsername();
+		int topMessagesCount = groupChat->getMessageCount(topUser);
+
+		for (size_t i = 0; i < groupChat->getParticipants().getSize(); i++)
+		{
+			int curr = groupChat->getMessageCount(groupChat->getParticipants()[i]->getUsername());
+
+			if (curr > topMessagesCount)
+			{
+				topMessagesCount = curr;
+				topUser = groupChat->getParticipants()[i]->getUsername();
+			}
+		}
+
+		cout << ", Top: " << topUser << " (" << topMessagesCount << " msg)" << endl;
+	}
+	else
+	{
+		cout << endl;
+	}
+}

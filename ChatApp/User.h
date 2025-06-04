@@ -30,4 +30,6 @@ public:
 
 	void setGroupAdmin(int chatId, const MyString& username);
 	void kickFromGroup(int chatId, const MyString& username);
+
+	void checkGroupStats(int chatId);
 };
