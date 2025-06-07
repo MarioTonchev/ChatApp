@@ -52,8 +52,19 @@ void GroupChat::removeAdmin(User* user) {
 	}
 }
 
+void GroupChat::removeUserFromApprovalList(User* user) {
+	for (size_t i = 0; i < awaitingApproval.getSize(); i++)
+	{
+		if (awaitingApproval[i]->getUsername() == user->getUsername())
+		{
+			awaitingApproval.remove_at(i);
+			break;
+		}
+	}
+}
+
 void GroupChat::printChat() const {
-	cout << "Chat " << chatName << ":" << endl;
+	cout << "Chat '" << chatName << "':" << endl;
 
 	if (messages.getSize() == 0)
 	{

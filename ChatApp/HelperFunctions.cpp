@@ -33,3 +33,15 @@ void printActions(const MyString& userType) {
 	cout << "logout" << endl;
 	cout << "quit" << endl;
 }
+
+void freeMemory(MyVector<User*>& users, MyVector<Chat*>& chats) {
+	for (size_t i = 0; i < users.getSize(); i++)
+	{
+		delete users[i];
+	}
+
+	for (size_t i = 0; i < chats.getSize(); i++)
+	{
+		delete chats[i];
+	}
+}

@@ -41,7 +41,7 @@ const MyString getUserType(User*& user) {
 	return userType;
 }
 
-void createAccount(const MyString& username, const MyString& password, MyVector<User*>& users) {
+void createRegularAccount(const MyString& username, const MyString& password, MyVector<User*>& users) {
 	if (username == "" || password == "")
 	{
 		cout << "Username and password cannot be empty!" << endl;
@@ -61,7 +61,30 @@ void createAccount(const MyString& username, const MyString& password, MyVector<
 	users.push_back(user);
 
 	saveUserToFile(user, getUserType(user));
-	saveUserToBinFile(user, getUserType(user));
+
+	cout << "Account created successfully." << endl;
+}
+
+void createAdminAccout(const MyString& username, const MyString& password, MyVector<User*>& users) {
+	if (username == "" || password == "")
+	{
+		cout << "Username and password cannot be empty!" << endl;
+		return;
+	}
+
+	User* user = findUser(username, users);
+
+	if (user)
+	{
+		cout << "User with given username already exists! Please try again." << endl;
+		return;
+	}
+
+	user = new Admin(Admin::createAdminId(users), username, password);
+
+	users.push_back(user);
+
+	saveUserToFile(user, getUserType(user));
 
 	cout << "Account created successfully." << endl;
 }
@@ -106,7 +129,7 @@ void login(const MyString& username, const MyString& password, MyVector<User*>& 
 
 			if (input == "y" || input == "yes")
 			{
-				createAccount(username, password, users);
+				createRegularAccount(username, password, users);
 				break;
 			}
 			else if (input == "n" || input == "no")

@@ -19,13 +19,15 @@ void saveUserToFile(User* user, const MyString& userType) {
 
 	os << userType << "|";
 
+	os << user->getUsername() << "|" << user->getPassword();
+
 	if (userType == "Admin")
 	{
 		Admin* admin = dynamic_cast<Admin*>(user);
-		os << admin->getAdminId() << "|";
+		os << "|" << admin->getAdminId();
 	}
 
-	os << user->getUsername() << "|" << user->getPassword() << endl;
+	os << endl;
 
 	os.close();
 }
@@ -181,7 +183,7 @@ void loadUsers(MyVector<User*>& users) {
 		}
 		else if (tokens[0] == "Admin")
 		{
-			Admin* admin = new Admin(tokens[1].toInt(), tokens[2], tokens[3]);
+			Admin* admin = new Admin(tokens[3].toInt(), tokens[1], tokens[2]);
 			users.push_back(admin);
 		}
 	}
@@ -427,6 +429,41 @@ void deleteChatFromFile(int chatId) {
 	fileName += ".txt";
 
 	remove(fileName.get());
+}
+void deleteUserFromFile(const MyString& username) {
+	ifstream is(usersFile);
+
+	if (!is.is_open())
+	{
+		throw invalid_argument("Error: Could not open fil!");
+	}
+
+	ofstream os("temp.txt");
+
+	if (!os.is_open())
+	{
+		throw invalid_argument("Error: Could not open fil!");
+	}
+
+	MyString buffer;
+	while (is.peek() != EOF)
+	{
+		buffer.getline(is);
+		MyVector<MyString> tokens = buffer.split('|');
+
+		if (tokens[1] == username)
+		{
+			continue;
+		}
+
+		os << buffer << endl;
+	}
+
+	is.close();
+	os.close();
+
+	remove(usersFile);
+	rename("temp.txt", usersFile);
 }
 void deleteUserChatRelation(const MyString& username, int chatId) {
 	ifstream is(usersChatsFile);

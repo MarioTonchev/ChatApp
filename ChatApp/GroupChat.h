@@ -19,7 +19,8 @@ public:
 
 	void setApproval(bool approval);
 	void addAdmin(User* user);
-	void removeAdmin(User* user);
+	void removeAdmin(User* user) override;
+	void removeUserFromApprovalList(User* u) override;
 
 	void printChat() const override;
 }; 

@@ -39,7 +39,15 @@ int main()
 			}
 			else if (tokens[0] == "register" && tokens.getSize() >= 3)
 			{
-				createAccount(tokens[1], tokens[2], users);
+				createRegularAccount(tokens[1], tokens[2], users);
+			}
+			else if (tokens[0] == "register-admin")
+			{
+				createAdminAccout(tokens[1], tokens[2], users);
+			}
+			else if (tokens[0] == "quit")
+			{
+				break;
 			}
 		}
 		else
@@ -119,6 +127,27 @@ int main()
 
 				loggedUser->checkGroupStats(tokens[1].toInt());
 			}
+			else if (tokens[0] == "delete-user" && userType == "Admin" && tokens.getSize() >= 2)
+			{
+				Admin* admin = dynamic_cast<Admin*>(loggedUser);
+				admin->deleteUser(tokens[1], users, chats);
+			}
+			else if (tokens[0] == "delete-group" && userType == "Admin" && tokens.getSize() == 2)
+			{
+				if (tokens[1] == "")
+				{
+					cout << "Chat id cannot be empty!" << endl;
+					continue;
+				}
+
+				Admin* admin = dynamic_cast<Admin*>(loggedUser);
+				admin->deleteGroupChat(tokens[1].toInt(), chats);
+			}
+			else if (tokens[0] == "view-all-chats" && userType == "Admin")
+			{
+				Admin* admin = dynamic_cast<Admin*>(loggedUser);
+				admin->viewAllChats(chats);
+			}
 			else if (tokens[0] == "logout")
 			{
 				loggedUser = nullptr;
@@ -131,4 +160,6 @@ int main()
 			}
 		}
 	}
+
+	freeMemory(users, chats);
 }

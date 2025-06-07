@@ -33,5 +33,6 @@ void loadApprovalList(MyVector<Chat*>& chats, MyVector<User*>& users);
 
 void deleteChatIdFromFile(int chatId);
 void deleteChatFromFile(int chatId);
+void deleteUserFromFile(const MyString& username);
 void deleteUserChatRelation(const MyString& username, int chatId);
 void deleteUserFromApprovaList(const MyString& username, int chatId);

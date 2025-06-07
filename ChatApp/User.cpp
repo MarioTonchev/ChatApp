@@ -96,18 +96,8 @@ void User::createIndividualChat(const MyString& username, MyVector<User*>& users
 		cout << "You already have an active chat with " << username << "!" << endl;
 		return;
 	}
-
-	int id = 1;
-
-	for (size_t i = 0; i < chats.getSize(); i++)
-	{
-		if (id <= chats[i]->getChatId())
-		{
-			id = chats[i]->getChatId() + 1;
-		}
-	}
 	
-	chat = new IndividualChat(id);
+	chat = new IndividualChat(Chat::createChatId(chats));
 	chat->addParticipant(this);
 	chat->addParticipant(user);
 
@@ -248,17 +238,7 @@ void User::createGroupChat(const MyString& groupName, MyVector<MyString>& userna
 		return;
 	}
 
-	int id = 1;
-
-	for (size_t i = 0; i < chats.getSize(); i++)
-	{
-		if (id <= chats[i]->getChatId())
-		{
-			id = chats[i]->getChatId() + 1;
-		}
-	}
-
-	chat = new GroupChat(id, groupName);
+	chat = new GroupChat(Chat::createChatId(chats), groupName);
 
 	for (size_t i = 2; i < usernames.getSize(); i++)
 	{
@@ -308,9 +288,9 @@ void User::leaveGroupChat(int chatId, MyVector<Chat*>& chats) {
 		return;
 	}
 
-	MyString chatType = getChatType(chat);
+	GroupChat* groupChat = dynamic_cast<GroupChat*>(chat);
 
-	if (chatType != "GroupChat")
+	if (!groupChat)
 	{
 		cout << "You aren't in a group chat with such id!" << endl;
 		return;
@@ -325,26 +305,20 @@ void User::leaveGroupChat(int chatId, MyVector<Chat*>& chats) {
 		}
 	}
 
-	for (size_t i = 0; i < chat->getParticipants().getSize(); i++)
-	{
-		if (chat->getParticipants()[i]->getUsername() == username)
-		{
-			chat->getParticipants().remove_at(i);
-		}
-	}
+	groupChat->removeParticipant(this);
 
-	if (chat->getParticipants().getSize() == 0)
+	if (groupChat->getParticipants().getSize() == 0)
 	{
 		deleteUserChatRelation(username, chatId);
 		
 		cout << "You successfully left chat with id " << chatId << "." << endl;
 		
-		deleteChat(chat, chats);
+		deleteChat(groupChat, chats);
+		cout << "Group chat with id " << groupChat->getChatId()
+			<< " was deleted because it had 0 users left!" << endl;
 
 		return;
 	}
-
-	GroupChat* groupChat = dynamic_cast<GroupChat*>(chat);
 
 	for (size_t i = 0; i < groupChat->getAdmins().getSize(); i++)
 	{
@@ -359,7 +333,7 @@ void User::leaveGroupChat(int chatId, MyVector<Chat*>& chats) {
 		groupChat->setApproval(false);
 	}
 
-	saveChatToFile(chat);
+	saveChatToFile(groupChat);
 	deleteUserChatRelation(username, chatId);
 
 	cout << "You successfully left chat with id " << chatId << "." << endl;

@@ -78,6 +78,4 @@ void deleteChat(Chat* chat, MyVector<Chat*>& chats) {
 			break;
 		}
 	}
-
-	cout << "Group chat with id " << chat->getChatId() << " was deleted because it had 0 users left!" << endl;
 }

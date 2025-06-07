@@ -7,6 +7,20 @@ int Chat::getChatId() const {
 	return chatId;
 }
 
+int Chat::createChatId(MyVector<Chat*>& chats) {
+	int id = 1;
+
+	for (size_t i = 0; i < chats.getSize(); i++)
+	{
+		if (id <= chats[i]->getChatId())
+		{
+			id = chats[i]->getChatId() + 1;
+		}
+	}
+
+	return id;
+}
+
 MyVector<User*>& Chat::getParticipants() {
 	return participants;
 }
