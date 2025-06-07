@@ -408,3 +408,6 @@ FodyWeavers.xsd
 /ChatApp/chats_4.txt
 /ChatApp/chats_5.txt
 /ChatApp/approvalList.txt
+/ChatApp/approvalList.bin
+/ChatApp/usersChats.bin
+/ChatApp/chatIds.bin
