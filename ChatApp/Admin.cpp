@@ -4,7 +4,7 @@
 
 using namespace std;
 
-Admin::Admin(int adminId, const MyString& username, const MyString& password) : User(username, password) {
+Admin::Admin(int adminId, const MyString& username, const MyString& password, FileHandler* fileHandler) : User(username, password, fileHandler) {
 	this->adminId = adminId;
 }
 
@@ -51,17 +51,18 @@ void Admin::deleteUser(const MyString& username, MyVector<User*>& users, MyVecto
 		currChat->removeParticipant(user);
 		currChat->removeAdmin(user);
 		currChat->removeUserFromApprovalList(user);
-		deleteUserChatRelation(username, currChat->getChatId());
+
+		fileHandler->deleteUserChatRelation(username, currChat->getChatId());
 
 		if (currChat->getParticipants().getSize() == 0)
 		{
-			deleteChat(currChat, chats);
+			deleteChat(currChat, chats, fileHandler);
 			cout << "Group chat with id " << currChat->getChatId()
 				<< " was deleted because it had 0 users left!" << endl;
 		}
 		else if (getChatType(currChat) == "IndividualChat" && currChat->getParticipants().getSize() == 1)
 		{
-			deleteChat(currChat, chats);
+			deleteChat(currChat, chats, fileHandler);
 
 			MyString otherParticipantUsername = currChat->getParticipants()[0]->getUsername() == username ?
 				currChat->getParticipants()[1]->getUsername() : currChat->getParticipants()[0]->getUsername();
@@ -69,14 +70,14 @@ void Admin::deleteUser(const MyString& username, MyVector<User*>& users, MyVecto
 			User* otherParticipant = findUser(otherParticipantUsername, users);
 			otherParticipant->removeChat(currChat);
 
-			deleteUserChatRelation(otherParticipantUsername, currChat->getChatId());
+			fileHandler->deleteUserChatRelation(otherParticipantUsername, currChat->getChatId());
 
 			cout << "Individual chat with id " << currChat->getChatId()
 				<< " was deleted because it had only 1 user left!" << endl;
 		}
 		else
 		{
-			saveChatToFile(user->getChats()[i]);
+			fileHandler->saveChatToFile(user->getChats()[i], getChatType(user->getChats()[i]));
 		}
 	}
 
@@ -89,7 +90,7 @@ void Admin::deleteUser(const MyString& username, MyVector<User*>& users, MyVecto
 		}
 	}
 
-	deleteUserFromFile(username);
+	fileHandler->deleteUserFromFile(username);
 
 	cout << "User " << username << " has been successfully deleted!" << endl;
 }
@@ -114,10 +115,10 @@ void Admin::deleteGroupChat(int chatId, MyVector<Chat*>& chats) {
 	for (size_t i = 0; i < chat->getParticipants().getSize(); i++)
 	{
 		chat->getParticipants()[i]->removeChat(chat);
-		deleteUserChatRelation(chat->getParticipants()[i]->getUsername(), chat->getChatId());
+		fileHandler->deleteUserChatRelation(chat->getParticipants()[i]->getUsername(), chat->getChatId());
 	}
 
-	deleteChat(chat, chats);
+	deleteChat(chat, chats, fileHandler);
 	cout << "Group chat with id " << chatId << " has been successfully deleted!" << endl;
 }
 

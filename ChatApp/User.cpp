@@ -3,12 +3,22 @@
 #include "User.h"
 #include "UserUtils.h"
 #include "ChatUtils.h"
+#include "FileHandler.h"
 
 using namespace std;
 
-User::User(const MyString& username, const MyString& password) {
+User::User(const MyString& username, const MyString& password, FileHandler* fileHandler) {
 	this->username = username;
 	this->password = password;
+
+	if (fileHandler != nullptr)
+	{
+		this->fileHandler = fileHandler;
+	}
+	else
+	{
+		throw invalid_argument("File handler cannot be null!");
+	}
 }
 
 User::~User() {}
@@ -105,10 +115,10 @@ void User::createIndividualChat(const MyString& username, MyVector<User*>& users
 	user->addChat(chat);
 	chats.push_back(chat);
 
-	saveChatToFile(chat);
-	saveChatIdToFile(chat);
-	saveUserChatToFile(this->username, chat->getChatId());
-	saveUserChatToFile(username, chat->getChatId());
+	fileHandler->saveChatToFile(chat, getChatType(chat));
+	fileHandler->saveChatIdToFile(chat);
+	fileHandler->saveUserChatToFile(this->username, chat->getChatId());
+	fileHandler->saveUserChatToFile(username, chat->getChatId());
 
 	cout << "Chat with id " << chat->getChatId() << " successfully created!" << endl;
 }
@@ -159,10 +169,11 @@ void User::selectChat(int chatId, MyVector<Chat*>& chats) {
 	if (command == "toggle-add-approval")
 	{
 		groupChat->setApproval(!(groupChat->getRequiresApproval()));
-		saveChatToFile(groupChat);
+
+		fileHandler->saveChatToFile(groupChat, getChatType(groupChat));
 
 		groupChat->getRequiresApproval() ? cout << "Adding approval has been turned on!" << endl 
-			: cout << "Adding approval has been turned off!";
+			: cout << "Adding approval has been turned off!" << endl;
 	}
 	else if (command == "view-add-requests")
 	{
@@ -199,12 +210,12 @@ void User::selectChat(int chatId, MyVector<Chat*>& chats) {
 			}
 		}
 
-		deleteUserFromApprovaList(tokens[1], chatId);
+		fileHandler->deleteUserFromApprovaList(tokens[1], chatId);
 
 		user->addChat(groupChat);
 		groupChat->addParticipant(user);
 
-		saveUserChatToFile(user->getUsername(), chatId);
+		fileHandler->saveUserChatToFile(user->getUsername(), chatId);
 
 		cout << "User " << user->getUsername() << " has been approved and was successfully added to the group chat!" << endl;
 	}
@@ -216,14 +227,15 @@ void User::selectChat(int chatId, MyVector<Chat*>& chats) {
 		Message message(username, command);
 
 		chat->addMessage(message);
-		saveChatToFile(chat);
+
+		fileHandler->saveChatToFile(chat, getChatType(chat));
 
 		cout << "Message sent successfully!" << endl;
 	}
-	else if (command == "cancel")
+	else
 	{
 		clearConsole();
-		user = findUser(this->username, groupChat->getParticipants());
+		user = findUser(this->username, chat->getParticipants());
 		MyString userType = getUserType(user);
 		printActions(userType);
 	}
@@ -252,6 +264,7 @@ void User::createGroupChat(const MyString& groupName, MyVector<MyString>& userna
 
 		if (!user)
 		{
+			//Fix this 
 			cout << "One of these users does not exist!" << endl;
 			return;
 		}
@@ -266,14 +279,13 @@ void User::createGroupChat(const MyString& groupName, MyVector<MyString>& userna
 	dynamic_cast<GroupChat*>(chat)->addAdmin(this);
 	chats.push_back(chat);
 
-	saveChatToFile(chat);
-	saveChatIdToFile(chat);
-
-	saveUserChatToFile(username, chat->getChatId());
+	fileHandler->saveChatToFile(chat, getChatType(chat));
+	fileHandler->saveChatIdToFile(chat);
+	fileHandler->saveUserChatToFile(username, chat->getChatId());
 
 	for (size_t i = 2; i < usernames.getSize(); i++)
 	{
-		saveUserChatToFile(usernames[i], chat->getChatId());
+		fileHandler->saveUserChatToFile(usernames[i], chat->getChatId());
 	}
 
 	cout << "Group chat with name '" << dynamic_cast<GroupChat*>(chat)->getChatName() << "' successfully created!" << endl;
@@ -305,15 +317,16 @@ void User::leaveGroupChat(int chatId, MyVector<Chat*>& chats) {
 		}
 	}
 
+	this->removeChat(groupChat);
 	groupChat->removeParticipant(this);
 
 	if (groupChat->getParticipants().getSize() == 0)
 	{
-		deleteUserChatRelation(username, chatId);
+		fileHandler->deleteUserChatRelation(username, chatId);
 		
 		cout << "You successfully left chat with id " << chatId << "." << endl;
 		
-		deleteChat(groupChat, chats);
+		deleteChat(groupChat, chats, fileHandler);
 		cout << "Group chat with id " << groupChat->getChatId()
 			<< " was deleted because it had 0 users left!" << endl;
 
@@ -333,8 +346,8 @@ void User::leaveGroupChat(int chatId, MyVector<Chat*>& chats) {
 		groupChat->setApproval(false);
 	}
 
-	saveChatToFile(groupChat);
-	deleteUserChatRelation(username, chatId);
+	fileHandler->saveChatToFile(groupChat, getChatType(groupChat));
+	fileHandler->deleteUserChatRelation(username, chatId);
 
 	cout << "You successfully left chat with id " << chatId << "." << endl;
 }
@@ -388,14 +401,14 @@ void User::addToGroup(int chatId, const MyString& username, MyVector<User*>& use
 	{
 		user->addChat(groupChat);
 		groupChat->addParticipant(user);
-		saveUserChatToFile(username, chatId);
+		fileHandler->saveUserChatToFile(username, chatId);
 
 		cout << "User " << username << " has been successfully added to the group chat!" << endl;
 	}
 	else
 	{
 		groupChat->getUsersAwaitingApproval().push_back(user);
-		saveUserToApprovalList(username, chatId);
+		fileHandler->saveUserToChatApprovalList(username, chatId);
 
 		cout << "User " << username << " has been added to the waiting for join approval list!" << endl;
 	}
@@ -450,7 +463,7 @@ void User::setGroupAdmin(int chatId, const MyString& username) {
 	}
 
 	groupChat->addAdmin(user);
-	saveChatToFile(groupChat);
+	fileHandler->saveChatToFile(groupChat, getChatType(groupChat));
 
 	cout << "Successfully made user " << username << " admin of '" << groupChat->getChatName() << "'!" << endl;
 }
@@ -499,8 +512,8 @@ void User::kickFromGroup(int chatId, const MyString& username) {
 	groupChat->removeParticipant(user);
 	groupChat->removeAdmin(user);
 
-	saveChatToFile(chat);
-	deleteUserChatRelation(username, chatId);
+	fileHandler->saveChatToFile(groupChat, getChatType(groupChat));
+	fileHandler->deleteUserChatRelation(username, chatId);
 
 	cout << "Successfully kicked user " << username << " from group chat '" << groupChat->getChatName() << "'!" << endl;
 }

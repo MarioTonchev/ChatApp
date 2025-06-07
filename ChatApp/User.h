@@ -6,14 +6,18 @@
 #include "IndividualChat.h"
 #include "GroupChat.h"
 
+class FileHandler;
+
 class User {
 protected:
 	MyString username;
 	MyString password;
 	MyVector<Chat*> chats;
 
+	FileHandler* fileHandler;
+
 public:
-	User(const MyString& username = "", const MyString& password = "");
+	User(const MyString& username = "", const MyString& password = "", FileHandler* fileHandler = nullptr);
 	virtual ~User();
 	const MyString& getUsername() const;
 	const MyString& getPassword() const;

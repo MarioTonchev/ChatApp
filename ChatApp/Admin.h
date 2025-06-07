@@ -2,7 +2,6 @@
 
 #include "User.h"
 #include "UserUtils.h"
-#include "IOManager.h"
 
 class Admin : public User {
 private:
@@ -10,7 +9,7 @@ private:
 
 public:
 	static int createAdminId(MyVector<User*>& users);
-	Admin(int adminId, const MyString& username = "", const MyString& password = "");
+	Admin(int adminId, const MyString& username = "", const MyString& password = "", FileHandler* fileHandler = nullptr);
 	int getAdminId() const;
 	void deleteUser(const MyString& username, MyVector<User*>& users, MyVector<Chat*>& chats);
 	void deleteGroupChat(int chatId, MyVector<Chat*>& chats);

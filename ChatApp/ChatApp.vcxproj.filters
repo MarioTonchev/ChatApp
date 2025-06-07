@@ -34,6 +34,18 @@
     <Filter Include="Source Files\Constants">
       <UniqueIdentifier>{908236d9-3162-4679-a858-a8f5200c7d2d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Core">
+      <UniqueIdentifier>{8ae10116-303c-437e-937d-1c699f4b7c3b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Core">
+      <UniqueIdentifier>{1e20ba17-aad4-4e73-a72a-452aba6fc40e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\IO">
+      <UniqueIdentifier>{88098c13-9a6d-45fa-8e08-0862033702bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\IO">
+      <UniqueIdentifier>{c6a6cbcc-bd00-45a4-8858-9bf3f968db14}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ChatApp.cpp">
@@ -66,9 +78,6 @@
     <ClCompile Include="FileConstants.cpp">
       <Filter>Source Files\Constants</Filter>
     </ClCompile>
-    <ClCompile Include="IOManager.cpp">
-      <Filter>Source Files\Utilities</Filter>
-    </ClCompile>
     <ClCompile Include="UserUtils.cpp">
       <Filter>Source Files\Utilities</Filter>
     </ClCompile>
@@ -77,6 +86,18 @@
     </ClCompile>
     <ClCompile Include="ChatUtils.cpp">
       <Filter>Source Files\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="Application.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="FileHandler.cpp">
+      <Filter>Source Files\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="TextFileHandler.cpp">
+      <Filter>Source Files\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="BinaryFileHandler.cpp">
+      <Filter>Source Files\IO</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -110,9 +131,6 @@
     <ClInclude Include="FileConstants.h">
       <Filter>Header Files\Constants</Filter>
     </ClInclude>
-    <ClInclude Include="IOManager.h">
-      <Filter>Header Files\Utilities</Filter>
-    </ClInclude>
     <ClInclude Include="UserUtils.h">
       <Filter>Header Files\Utilities</Filter>
     </ClInclude>
@@ -121,6 +139,18 @@
     </ClInclude>
     <ClInclude Include="ChatUtils.h">
       <Filter>Header Files\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="Application.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="FileHandler.h">
+      <Filter>Header Files\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="TextFileHandler.h">
+      <Filter>Header Files\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="BinaryFileHandler.h">
+      <Filter>Header Files\IO</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -139,6 +169,15 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="users.bin">
+      <Filter>Files</Filter>
+    </None>
+    <None Include="chatIds.bin">
+      <Filter>Files</Filter>
+    </None>
+    <None Include="approvalList.bin">
+      <Filter>Files</Filter>
+    </None>
+    <None Include="usersChats.bin">
       <Filter>Files</Filter>
     </None>
   </ItemGroup>

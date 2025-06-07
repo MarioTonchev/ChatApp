@@ -4,7 +4,6 @@
 #include "Chat.h"
 #include "GroupChat.h"
 #include "IndividualChat.h"
-#include "IOManager.h"
 
 using namespace std;
 
@@ -61,14 +60,14 @@ const MyString getChatType(Chat* chat) {
 	return chatType;
 }
 
-void deleteChat(Chat* chat, MyVector<Chat*>& chats) {
+void deleteChat(Chat* chat, MyVector<Chat*>& chats, FileHandler* fileHandler) {
 	if (!chat)
 	{
 		throw invalid_argument("Chat cannot be null!");
 	}
 
-	deleteChatIdFromFile(chat->getChatId());
-	deleteChatFromFile(chat->getChatId());
+	fileHandler->deleteChatIdFromFile(chat->getChatId());
+	fileHandler->deleteChatFromFile(chat->getChatId());
 
 	for (size_t i = 0; i < chats.getSize(); i++)
 	{

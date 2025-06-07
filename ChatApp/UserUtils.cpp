@@ -41,7 +41,7 @@ const MyString getUserType(User*& user) {
 	return userType;
 }
 
-void createRegularAccount(const MyString& username, const MyString& password, MyVector<User*>& users) {
+void createRegularAccount(const MyString& username, const MyString& password, MyVector<User*>& users, FileHandler* fileHandler) {
 	if (username == "" || password == "")
 	{
 		cout << "Username and password cannot be empty!" << endl;
@@ -56,16 +56,15 @@ void createRegularAccount(const MyString& username, const MyString& password, My
 		return;
 	}
 
-	user = new RegularUser(username, password);
+	user = new RegularUser(username, password, fileHandler);
 
 	users.push_back(user);
-
-	saveUserToFile(user, getUserType(user));
+	fileHandler->saveUserToFile(user, getUserType(user));
 
 	cout << "Account created successfully." << endl;
 }
 
-void createAdminAccout(const MyString& username, const MyString& password, MyVector<User*>& users) {
+void createAdminAccout(const MyString& username, const MyString& password, MyVector<User*>& users, FileHandler* fileHandler) {
 	if (username == "" || password == "")
 	{
 		cout << "Username and password cannot be empty!" << endl;
@@ -80,16 +79,15 @@ void createAdminAccout(const MyString& username, const MyString& password, MyVec
 		return;
 	}
 
-	user = new Admin(Admin::createAdminId(users), username, password);
+	user = new Admin(Admin::createAdminId(users), username, password, fileHandler);
 
 	users.push_back(user);
-
-	saveUserToFile(user, getUserType(user));
+	fileHandler->saveUserToFile(user, getUserType(user));
 
 	cout << "Account created successfully." << endl;
 }
 
-void login(const MyString& username, const MyString& password, MyVector<User*>& users, User*& loggedUser, MyString& userType) {
+void login(const MyString& username, const MyString& password, MyVector<User*>& users, User*& loggedUser, MyString& userType, FileHandler* fileHandler) {
 	if (username == "" || password == "")
 	{
 		cout << "Username and password cannot be empty!" << endl;
@@ -129,7 +127,7 @@ void login(const MyString& username, const MyString& password, MyVector<User*>& 
 
 			if (input == "y" || input == "yes")
 			{
-				createRegularAccount(username, password, users);
+				createRegularAccount(username, password, users, fileHandler);
 				break;
 			}
 			else if (input == "n" || input == "no")
