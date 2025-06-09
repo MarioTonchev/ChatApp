@@ -264,8 +264,16 @@ void User::createGroupChat(const MyString& groupName, MyVector<MyString>& userna
 
 		if (!user)
 		{
-			//Fix this 
+			for (size_t j = 2; j < i; j++)
+			{
+				User* user = findUser(usernames[j], users);
+
+				user->removeChat(chat);
+				chat->removeParticipant(user);
+			}
+
 			cout << "One of these users does not exist!" << endl;
+
 			return;
 		}
 
