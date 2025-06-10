@@ -16,8 +16,13 @@ using namespace std;
 
 class Application {
 private:
+	MyVector<User*> users;
+	MyVector<Chat*> chats;
+	User* loggedUser;
+
 	FileHandler* fileHandler;
 public:
 	Application(const MyString& fileMode = "txt");
+	~Application();
 	void run();
 };
