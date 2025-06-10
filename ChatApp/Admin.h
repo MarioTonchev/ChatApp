@@ -13,5 +13,6 @@ public:
 	int getAdminId() const;
 	void deleteUser(const MyString& username, MyVector<User*>& users, MyVector<Chat*>& chats);
 	void deleteGroupChat(int chatId, MyVector<Chat*>& chats);
-	void viewAllChats(MyVector<Chat*>& chats);
+	void viewAllChats(MyVector<Chat*>& chats) const;
+	void printActions() const override;
 };

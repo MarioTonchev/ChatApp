@@ -28,13 +28,19 @@ public:
 	void viewChats() const;
 
 	void createIndividualChat(const MyString& username, MyVector<User*>& users, MyVector<Chat*>& chats);
-	void selectChat(int chatId, MyVector<Chat*>& chats);
+	void selectChat(int chatId);
 	void createGroupChat(const MyString& groupName, MyVector<MyString>& usernames, MyVector<User*>& users, MyVector<Chat*>& chats);
 	void leaveGroupChat(int chatId, MyVector<Chat*>& chats);
 	
 	void addToGroup(int chatId, const MyString& username, MyVector<User*>& users);
-	void setGroupAdmin(int chatId, const MyString& username);
 	void kickFromGroup(int chatId, const MyString& username);
+	void setGroupAdmin(int chatId, const MyString& username);
+
+	void toggleAddApproval(int chatId);
+	void viewAddRequests(int chatId);
+	void approveAddRequest(int chatId, const MyString& username);
 
 	void checkGroupStats(int chatId);
+
+	virtual void printActions() const = 0;
 };
