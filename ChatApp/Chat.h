@@ -21,13 +21,11 @@ public:
 	MyVector<Message>& getMessages();
 	int getMessageCount(const MyString& username);
 
-	virtual void printChat() const = 0;
-
 	void addParticipant(User* user);
-
 	void removeParticipant(User* user);
-	virtual void removeAdmin(User* user) = 0;
-	virtual void removeUserFromApprovalList(User* user) = 0;
 
 	void addMessage(Message message);
+
+	virtual void printChatInfo() const = 0;
+	virtual void printChatMessages() const = 0;
 };

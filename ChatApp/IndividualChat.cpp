@@ -8,8 +8,13 @@ IndividualChat::IndividualChat(int chatId) {
 	this->chatId = chatId;
 }
 
-void IndividualChat::printChat() const {
-	cout << "Chat " << chatId <<":" << endl;
+void IndividualChat::printChatInfo() const {
+	cout << "Individual chat with id " << chatId << " ("
+		<< messages.getSize() << " messages)" << endl;
+}
+
+void IndividualChat::printChatMessages() const {
+	cout << "Individual chat with id " << chatId <<":" << endl;
 
 	if (messages.getSize() == 0)
 	{
@@ -22,12 +27,4 @@ void IndividualChat::printChat() const {
 		cout << "[" << messages[i].getSender() << ", " << messages[i].getDate() << " " << messages[i].getTime()
 			<< "] " << messages[i].getContent() << endl;
 	}
-}
-
-void IndividualChat::removeAdmin(User* user) {
-
-}
-
-void IndividualChat::removeUserFromApprovalList(User* user) {
-
 }
