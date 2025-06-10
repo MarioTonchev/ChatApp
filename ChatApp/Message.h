@@ -9,8 +9,6 @@ private:
 	MyString dateSent;
 	MyString timeSent;
 
-	void setCurrentDate();
-	void setCurrentTime();
 public:
 	Message(const MyString& sender = "", const MyString& content = "");
 	Message(const MyString& sender, const MyString& content, const MyString& date, const MyString& time);
