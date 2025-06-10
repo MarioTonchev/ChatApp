@@ -5,5 +5,7 @@
 #include "Chat.h"
 
 void clearConsole();
-void printActions(const MyString& userType);
+void printLoginScreen();
+MyString getCurrentDate();
+MyString getCurrentTime();
 void freeMemory(MyVector<User*>& users, MyVector<Chat*>& chats);
