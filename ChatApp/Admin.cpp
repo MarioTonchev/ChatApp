@@ -47,10 +47,15 @@ void Admin::deleteUser(const MyString& username, MyVector<User*>& users, MyVecto
 	for (size_t i = 0; i < user->getChats().getSize(); i++)
 	{
 		Chat* currChat = user->getChats()[i];
+		MyString chatType = getChatType(currChat);
 
 		currChat->removeParticipant(user);
-		currChat->removeAdmin(user);
-		currChat->removeUserFromApprovalList(user);
+
+		if (GroupChat* groupChat = dynamic_cast<GroupChat*>(currChat))
+		{
+			groupChat->removeAdmin(user);
+			groupChat->removeUserFromApprovalList(user);
+		}
 
 		fileHandler->deleteUserChatRelation(username, currChat->getChatId());
 
@@ -60,24 +65,23 @@ void Admin::deleteUser(const MyString& username, MyVector<User*>& users, MyVecto
 			cout << "Group chat with id " << currChat->getChatId()
 				<< " was deleted because it had 0 users left!" << endl;
 		}
-		else if (getChatType(currChat) == "IndividualChat" && currChat->getParticipants().getSize() == 1)
+		else if (chatType == "IndividualChat" && currChat->getParticipants().getSize() == 1)
 		{
 			deleteChat(currChat, chats, fileHandler);
-
-			MyString otherParticipantUsername = currChat->getParticipants()[0]->getUsername() == username ?
-				currChat->getParticipants()[1]->getUsername() : currChat->getParticipants()[0]->getUsername();
-
-			User* otherParticipant = findUser(otherParticipantUsername, users);
-			otherParticipant->removeChat(currChat);
-
-			fileHandler->deleteUserChatRelation(otherParticipantUsername, currChat->getChatId());
 
 			cout << "Individual chat with id " << currChat->getChatId()
 				<< " was deleted because it had only 1 user left!" << endl;
 		}
 		else
 		{
-			fileHandler->saveChatToFile(user->getChats()[i], getChatType(user->getChats()[i]));
+			if (chatType == "IndividualChat")
+			{
+				fileHandler->saveChatToFile((IndividualChat*)currChat);
+			}
+			else if (chatType == "GroupChat")
+			{
+				fileHandler->saveChatToFile((GroupChat*)currChat);
+			}
 		}
 	}
 
@@ -92,19 +96,13 @@ void Admin::deleteUser(const MyString& username, MyVector<User*>& users, MyVecto
 
 	fileHandler->deleteUserFromFile(username);
 
+	delete user;
+
 	cout << "User " << username << " has been successfully deleted!" << endl;
 }
 
 void Admin::deleteGroupChat(int chatId, MyVector<Chat*>& chats) {
-	Chat* chat = findChatById(chatId, chats);
-
-	if (!chat)
-	{
-		cout << "Group chat with id " << chatId << " does not exist!" << endl;
-		return;
-	}
-
-	GroupChat* groupChat = dynamic_cast<GroupChat*>(chat);
+	GroupChat* groupChat = findGroupChatById(chatId, chats);
 
 	if (!groupChat)
 	{
@@ -112,17 +110,12 @@ void Admin::deleteGroupChat(int chatId, MyVector<Chat*>& chats) {
 		return;
 	}
 
-	for (size_t i = 0; i < chat->getParticipants().getSize(); i++)
-	{
-		chat->getParticipants()[i]->removeChat(chat);
-		fileHandler->deleteUserChatRelation(chat->getParticipants()[i]->getUsername(), chat->getChatId());
-	}
+	deleteChat(groupChat, chats, fileHandler);
 
-	deleteChat(chat, chats, fileHandler);
 	cout << "Group chat with id " << chatId << " has been successfully deleted!" << endl;
 }
 
-void Admin::viewAllChats(MyVector<Chat*>& chats) {
+void Admin::viewAllChats(MyVector<Chat*>& chats) const {
 	if (chats.getSize() == 0)
 	{
 		cout << "There are currently 0 active chats." << endl;
@@ -131,6 +124,31 @@ void Admin::viewAllChats(MyVector<Chat*>& chats) {
 
 	for (size_t i = 0; i < chats.getSize(); i++)
 	{
-		chats[i]->printChat();
+		chats[i]->printChatMessages();
+		cout << endl;
 	}
+}
+
+void Admin::printActions() const {
+	cout << "You are able to use the following commands:" << endl << endl;
+
+	cout << "delete-user <username>" << endl;
+	cout << "delete-group <chatId>" << endl;
+	cout << "view-all-chats" << endl << endl;
+
+	cout << "view-chats" << endl;
+	cout << "select-chat <chatId>" << endl;
+	cout << "create-individual-chat <username>" << endl;
+	cout << "create-group <groupName> <username1> <username2> ...." << endl;
+	cout << "leave-group <chatId>" << endl;
+	cout << "add-to-group <chatId> <username>" << endl;
+	cout << "kick-from-group <chatId> <username>" << endl;
+	cout << "set-group-admin <chatId> <username>" << endl;
+	cout << "group-stats <chatId>" << endl << endl;
+	cout << "toggle-group-add-approval <chatId>" << endl;
+	cout << "view-group-approval-list <chatId>" << endl;
+	cout << "approve <chatId> <username>" << endl << endl;
+
+	cout << "logout" << endl;
+	cout << "quit" << endl;
 }
