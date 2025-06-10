@@ -13,64 +13,62 @@ Application::Application(const MyString& fileMode) {
 	{
 		throw std::invalid_argument("Invalid file mode: choose between 'txt' and 'bin'");
 	}
+
+	loggedUser = nullptr;
+}
+
+Application::~Application() {
+	delete fileHandler;
+	freeMemory(users, chats);
 }
 
 void Application::run() {
-	MyVector<User*> users;
-	MyVector<Chat*> chats;
-
 	fileHandler->loadUsers(users);
 	fileHandler->loadChats(chats, users);
 	fileHandler->loadUserChats(users, chats);
 
-	User* loggedUser = nullptr;
-	MyString command;
 	MyString userType;
+	MyString command;
 	MyVector<MyString> tokens;
 
-	cout << "Welcome to BlahBlah! To login or register use the following commands:" << endl;
+	printLoginScreen();
 
 	while (true)
 	{
+		command.getline(cin);
+		tokens = command.split(' ');
+		MyString action = tokens[0];
+
 		if (!loggedUser)
 		{
-			cout << "login <username> <password>" << endl;
-			cout << "register <username> <password>" << endl;
-
-			command.getline(cin);
-			tokens = command.split(' ');
-
-			if (tokens[0] == "login" && tokens.getSize() >= 3)
+			if (action == "login" && tokens.getSize() == 3)
 			{
 				login(tokens[1], tokens[2], users, loggedUser, userType, fileHandler);
 			}
-			else if (tokens[0] == "register" && tokens.getSize() >= 3)
+			else if (action == "register" && tokens.getSize() == 3)
 			{
 				createRegularAccount(tokens[1], tokens[2], users, fileHandler);
 			}
-			else if (tokens[0] == "register-admin")
+			else if (action == "register-admin" && tokens.getSize() == 3)
 			{
 				createAdminAccout(tokens[1], tokens[2], users, fileHandler);
 			}
-			else if (tokens[0] == "quit")
+			else if (action == "quit")
 			{
 				break;
 			}
 		}
 		else
 		{
-			command.getline(cin);
-			tokens = command.split(' ');
-
-			if (tokens[0] == "view-chats")
+			if (action == "view-chats")
 			{
 				loggedUser->viewChats();
 			}
-			else if (tokens[0] == "create-individual-chat" && tokens.getSize() >= 2)
+			else if (action == "create-individual-chat" && tokens.getSize() == 2)
 			{
 				loggedUser->createIndividualChat(tokens[1], users, chats);
 			}
-			else if (tokens[0] == "select-chat" && tokens.getSize() == 2)
+			else if (action == "select-chat" && tokens.getSize() == 2)
 			{
 				if (tokens[1] == "")
 				{
@@ -78,13 +76,13 @@ void Application::run() {
 					continue;
 				}
 
-				loggedUser->selectChat(tokens[1].toInt(), chats);
+				loggedUser->selectChat(tokens[1].toInt());
 			}
-			else if (tokens[0] == "create-group" && tokens.getSize() >= 3)
+			else if (action == "create-group" && tokens.getSize() >= 3)
 			{
 				loggedUser->createGroupChat(tokens[1], tokens, users, chats);
 			}
-			else if (tokens[0] == "leave-group" && tokens.getSize() == 2)
+			else if (action == "leave-group" && tokens.getSize() == 2)
 			{
 				if (tokens[1] == "")
 				{
@@ -94,7 +92,7 @@ void Application::run() {
 
 				loggedUser->leaveGroupChat(tokens[1].toInt(), chats);
 			}
-			else if (tokens[0] == "set-group-admin" && tokens.getSize() >= 3)
+			else if (action == "set-group-admin" && tokens.getSize() == 3)
 			{
 				if (tokens[1] == "")
 				{
@@ -104,7 +102,7 @@ void Application::run() {
 
 				loggedUser->setGroupAdmin(tokens[1].toInt(), tokens[2]);
 			}
-			else if (tokens[0] == "add-to-group" && tokens.getSize() >= 3)
+			else if (action == "add-to-group" && tokens.getSize() == 3)
 			{
 				if (tokens[1] == "")
 				{
@@ -114,7 +112,7 @@ void Application::run() {
 
 				loggedUser->addToGroup(tokens[1].toInt(), tokens[2], users);
 			}
-			else if (tokens[0] == "kick-from-group" && tokens.getSize() >= 3)
+			else if (action == "kick-from-group" && tokens.getSize() == 3)
 			{
 				if (tokens[1] == "")
 				{
@@ -124,7 +122,7 @@ void Application::run() {
 
 				loggedUser->kickFromGroup(tokens[1].toInt(), tokens[2]);
 			}
-			else if (tokens[0] == "group-stats" && tokens.getSize() == 2)
+			else if (action == "group-stats" && tokens.getSize() == 2)
 			{
 				if (tokens[1] == "")
 				{
@@ -134,12 +132,42 @@ void Application::run() {
 
 				loggedUser->checkGroupStats(tokens[1].toInt());
 			}
-			else if (tokens[0] == "delete-user" && userType == "Admin" && tokens.getSize() >= 2)
+			else if (action == "toggle-group-add-approval" && tokens.getSize() == 2)
+			{
+				if (tokens[1] == "")
+				{
+					cout << "Chat id cannot be empty!" << endl;
+					continue;
+				}
+
+				loggedUser->toggleAddApproval(tokens[1].toInt());
+			}
+			else if (action == "view-group-approval-list" && tokens.getSize() == 2)
+			{
+				if (tokens[1] == "")
+				{
+					cout << "Chat id cannot be empty!" << endl;
+					continue;
+				}
+
+				loggedUser->viewAddRequests(tokens[1].toInt());
+			}
+			else if (action == "approve" && tokens.getSize() == 3)
+			{
+				if (tokens[1] == "")
+				{
+					cout << "Chat id cannot be empty!" << endl;
+					continue;
+				}
+
+				loggedUser->approveAddRequest(tokens[1].toInt(), tokens[2]);
+			}
+			else if (action == "delete-user" && userType == "Admin" && tokens.getSize() == 2)
 			{
 				Admin* admin = dynamic_cast<Admin*>(loggedUser);
 				admin->deleteUser(tokens[1], users, chats);
 			}
-			else if (tokens[0] == "delete-group" && userType == "Admin" && tokens.getSize() == 2)
+			else if (action == "delete-group" && userType == "Admin" && tokens.getSize() == 2)
 			{
 				if (tokens[1] == "")
 				{
@@ -150,23 +178,22 @@ void Application::run() {
 				Admin* admin = dynamic_cast<Admin*>(loggedUser);
 				admin->deleteGroupChat(tokens[1].toInt(), chats);
 			}
-			else if (tokens[0] == "view-all-chats" && userType == "Admin")
+			else if (action == "view-all-chats" && userType == "Admin")
 			{
 				Admin* admin = dynamic_cast<Admin*>(loggedUser);
 				admin->viewAllChats(chats);
 			}
-			else if (tokens[0] == "logout")
+			else if (action == "logout")
 			{
 				loggedUser = nullptr;
 				userType = "";
 				clearConsole();
+				printLoginScreen();
 			}
-			else if (tokens[0] == "quit")
+			else if (action == "quit")
 			{
 				break;
 			}
 		}
 	}
-
-	freeMemory(users, chats);
 }
