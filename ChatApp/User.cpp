@@ -57,22 +57,14 @@ void User::viewChats() const {
 	{
 		cout << " No active chats";
 	}
+	else
+	{
+		cout << endl;
+	}
 
 	for (size_t i = 0; i < chats.getSize(); i++)
 	{
-		if (IndividualChat* chat = dynamic_cast<IndividualChat*>(chats[i]))
-		{
-			MyString username = chat->getParticipants()[0]->getUsername() == this->username
-				? chat->getParticipants()[1]->getUsername() : chat->getParticipants()[0]->getUsername();
-
-			cout << "Id: " << chat->getChatId() << ", " << username << " (" 
-				<< chat->getMessages().getSize() << " messages)" << " ";
-		}
-		else if (GroupChat* chat = dynamic_cast<GroupChat*>(chats[i]))
-		{
-			cout << "Id: " << chat->getChatId() << ", " << chat->getChatName() 
-				<< " (" << chat->getMessages().getSize() << " messages)" << " ";
-		}
+		chats[i]->printChatInfo();
 	}
 
 	cout << endl;
@@ -99,14 +91,14 @@ void User::createIndividualChat(const MyString& username, MyVector<User*>& users
 		return;
 	}
 
-	Chat* chat = findIndividualChatByUsernames(this->username, username, chats);
+	IndividualChat* chat = findIndividualChatByUsernames(this->username, username, chats);
 
 	if (chat)
 	{
 		cout << "You already have an active chat with " << username << "!" << endl;
 		return;
 	}
-	
+
 	chat = new IndividualChat(Chat::createChatId(chats));
 	chat->addParticipant(this);
 	chat->addParticipant(user);
@@ -115,7 +107,7 @@ void User::createIndividualChat(const MyString& username, MyVector<User*>& users
 	user->addChat(chat);
 	chats.push_back(chat);
 
-	fileHandler->saveChatToFile(chat, getChatType(chat));
+	fileHandler->saveChatToFile(chat);
 	fileHandler->saveChatIdToFile(chat);
 	fileHandler->saveUserChatToFile(this->username, chat->getChatId());
 	fileHandler->saveUserChatToFile(username, chat->getChatId());
@@ -123,130 +115,53 @@ void User::createIndividualChat(const MyString& username, MyVector<User*>& users
 	cout << "Chat with id " << chat->getChatId() << " successfully created!" << endl;
 }
 
-void User::selectChat(int chatId, MyVector<Chat*>& chats) {
-	Chat* chat = findChatById(chatId, chats);
+void User::selectChat(int chatId) {
+	Chat* chat = findChatById(chatId, this->chats);
 
 	if (!chat)
 	{
-		cout << "Chat with such id does not exist!" << endl;
+		cout << "You aren't in any chat with id " << chatId << "!" << endl;
 		return;
 	}
 
-	User* user = findUser(username, chat->getParticipants());
-
-	if (!user)
-	{
-		cout << "You don't have access to this chat!" << endl;
-		return;
-	}
-
-	chat->printChat();
-
-	cout << endl << "You can choose one of the following commands (type 'cancel' to stop):" << endl;
-
-	GroupChat* groupChat = dynamic_cast<GroupChat*>(chat);
-
-	if (groupChat)
-	{
-		user = findUser(username, groupChat->getAdmins());
-
-		if (user)
-		{
-			cout << "toggle-add-approval" << endl;
-			cout << "view-add-requests" << endl;
-			cout << "approve <username>" << endl;
-		}
-	}
+	chat->printChatMessages();
 	
-	cout << "send-message" << endl;
+	cout << endl << "Enter message (type 'cancel' to stop):" << endl;
 
-
-	MyString command;
-	command.getline(cin);
-
-	MyVector<MyString> tokens = command.split(' ');
-
-	if (command == "toggle-add-approval")
+	MyString input;
+	input.getline(cin);
+	
+	if (input != "cancel")
 	{
-		groupChat->setApproval(!(groupChat->getRequiresApproval()));
-
-		fileHandler->saveChatToFile(groupChat, getChatType(groupChat));
-
-		groupChat->getRequiresApproval() ? cout << "Adding approval has been turned on!" << endl 
-			: cout << "Adding approval has been turned off!" << endl;
-	}
-	else if (command == "view-add-requests")
-	{
-		cout << "Users awaiting approval: ";
-
-		if (groupChat->getUsersAwaitingApproval().getSize() == 0)
-		{
-			cout << "none";
-		}
-
-		for (size_t i = 0; i < groupChat->getUsersAwaitingApproval().getSize(); i++)
-		{
-			cout << groupChat->getUsersAwaitingApproval()[i]->getUsername() << " ";
-		}
-
-		cout << endl;
-	}
-	else if (tokens[0] == "approve" && tokens.getSize() >= 2)
-	{
-		user = findUser(tokens[1], groupChat->getUsersAwaitingApproval());
-
-		if (!user)
-		{
-			cout << "User " << tokens[1] << " does not exist in the approval list!" << endl;
-			return;
-		}
-
-		for (size_t i = 0; i < groupChat->getUsersAwaitingApproval().getSize(); i++)
-		{
-			if (user->getUsername() == groupChat->getUsersAwaitingApproval()[i]->getUsername())
-			{
-				groupChat->getUsersAwaitingApproval().remove_at(i);
-				break;
-			}
-		}
-
-		fileHandler->deleteUserFromApprovaList(tokens[1], chatId);
-
-		user->addChat(groupChat);
-		groupChat->addParticipant(user);
-
-		fileHandler->saveUserChatToFile(user->getUsername(), chatId);
-
-		cout << "User " << user->getUsername() << " has been approved and was successfully added to the group chat!" << endl;
-	}
-	else if (command == "send-message")
-	{
-		cout << "Enter message (type 'cancel' to stop):" << endl;
-		command.getline(cin);
-
-		Message message(username, command);
-
+		Message message(this->username, input);
 		chat->addMessage(message);
 
-		fileHandler->saveChatToFile(chat, getChatType(chat));
+		MyString chatType = getChatType(chat);
+		
+		if (chatType == "IndividualChat")
+		{
+			fileHandler->saveChatToFile((IndividualChat*)chat);
+		}
+		else if (chatType == "GroupChat")
+		{
+			fileHandler->saveChatToFile((GroupChat*)chat);
+		}
 
 		cout << "Message sent successfully!" << endl;
 	}
 	else
 	{
 		clearConsole();
-		user = findUser(this->username, chat->getParticipants());
-		MyString userType = getUserType(user);
-		printActions(userType);
+		this->printActions();
 	}
 }
 
 void User::createGroupChat(const MyString& groupName, MyVector<MyString>& usernames, MyVector<User*>& users, MyVector<Chat*>& chats) {
-	Chat* chat = findGroupChatByName(groupName, chats);
+	GroupChat* chat = findGroupChatByName(groupName, chats);
 
 	if (chat)
 	{
-		cout << "Chat with this name already exists!" << endl;
+		cout << "Group chat with this name already exists!" << endl;
 		return;
 	}
 
@@ -284,10 +199,10 @@ void User::createGroupChat(const MyString& groupName, MyVector<MyString>& userna
 	this->addChat(chat);
 	chat->addParticipant(this);
 
-	dynamic_cast<GroupChat*>(chat)->addAdmin(this);
+	chat->addAdmin(this);
 	chats.push_back(chat);
 
-	fileHandler->saveChatToFile(chat, getChatType(chat));
+	fileHandler->saveChatToFile(chat);
 	fileHandler->saveChatIdToFile(chat);
 	fileHandler->saveUserChatToFile(username, chat->getChatId());
 
@@ -296,33 +211,16 @@ void User::createGroupChat(const MyString& groupName, MyVector<MyString>& userna
 		fileHandler->saveUserChatToFile(usernames[i], chat->getChatId());
 	}
 
-	cout << "Group chat with name '" << dynamic_cast<GroupChat*>(chat)->getChatName() << "' successfully created!" << endl;
+	cout << "Group chat with name '" << chat->getChatName() << "' successfully created!" << endl;
 }
 
 void User::leaveGroupChat(int chatId, MyVector<Chat*>& chats) {
-	Chat* chat = findChatById(chatId, this->chats);
-
-	if (!chat)
-	{
-		cout << "You aren't in a group chat with such id!" << endl;
-		return;
-	}
-
-	GroupChat* groupChat = dynamic_cast<GroupChat*>(chat);
+	GroupChat* groupChat = findGroupChatById(chatId, this->chats);
 
 	if (!groupChat)
 	{
 		cout << "You aren't in a group chat with such id!" << endl;
 		return;
-	}
-
-	for (size_t i = 0; i < this->chats.getSize(); i++)
-	{
-		if (this->chats[i]->getChatId() == chatId)
-		{
-			this->chats.remove_at(i);
-			break;
-		}
 	}
 
 	this->removeChat(groupChat);
@@ -331,30 +229,25 @@ void User::leaveGroupChat(int chatId, MyVector<Chat*>& chats) {
 	if (groupChat->getParticipants().getSize() == 0)
 	{
 		fileHandler->deleteUserChatRelation(username, chatId);
-		
+
 		cout << "You successfully left chat with id " << chatId << "." << endl;
-		
+
 		deleteChat(groupChat, chats, fileHandler);
+
 		cout << "Group chat with id " << groupChat->getChatId()
 			<< " was deleted because it had 0 users left!" << endl;
 
 		return;
 	}
 
-	for (size_t i = 0; i < groupChat->getAdmins().getSize(); i++)
-	{
-		if (groupChat->getAdmins()[i]->getUsername() == username)
-		{
-			groupChat->getAdmins().remove_at(i);
-		}
-	}
+	groupChat->removeAdmin(this);
 
 	if (groupChat->getAdmins().getSize() == 0)
 	{
 		groupChat->setApproval(false);
 	}
 
-	fileHandler->saveChatToFile(groupChat, getChatType(groupChat));
+	fileHandler->saveChatToFile(groupChat);
 	fileHandler->deleteUserChatRelation(username, chatId);
 
 	cout << "You successfully left chat with id " << chatId << "." << endl;
@@ -373,15 +266,7 @@ void User::addToGroup(int chatId, const MyString& username, MyVector<User*>& use
 		return;
 	}
 
-	Chat* chat = findChatById(chatId, this->chats);
-
-	if (!chat)
-	{
-		cout << "You aren't in any group chat with id " << chatId << "." << endl;
-		return;
-	}
-
-	GroupChat* groupChat = dynamic_cast<GroupChat*>(chat);
+	GroupChat* groupChat = findGroupChatById(chatId, this->chats);
 
 	if (!groupChat)
 	{
@@ -415,77 +300,15 @@ void User::addToGroup(int chatId, const MyString& username, MyVector<User*>& use
 	}
 	else
 	{
-		groupChat->getUsersAwaitingApproval().push_back(user);
+		groupChat->addUserToApprovalList(user);
 		fileHandler->saveUserToChatApprovalList(username, chatId);
 
 		cout << "User " << username << " has been added to the waiting for join approval list!" << endl;
 	}
 }
 
-void User::setGroupAdmin(int chatId, const MyString& username) {
-	Chat* chat = findChatById(chatId, this->chats);
-
-	if (!chat)
-	{
-		cout << "You aren't in any group chat with id " << chatId << "." << endl;
-		return;
-	}
-
-	GroupChat* groupChat = dynamic_cast<GroupChat*>(chat);
-
-	if (!groupChat)
-	{
-		cout << "You aren't in any group chat with id " << chatId << "." << endl;
-		return;
-	}
-
-	User* user = findUser(this->username, groupChat->getAdmins());
-
-	if (!user)
-	{
-		cout << "You are not an admin of group chat "
-			<< groupChat->getChatName() << "! Only group admins can make other participants admins." << endl;
-		return;
-	}
-
-	if (this->username == username)
-	{
-		cout << "You can't make yourself admin!" << endl;
-		return;
-	}
-
-	user = findUser(username, groupChat->getAdmins());
-
-	if (user)
-	{
-		cout << "User " << username << " is already an admin of group chat '" << groupChat->getChatName() << "'." << endl;
-		return;
-	}
-
-	user = findUser(username, groupChat->getParticipants());
-
-	if (!user)
-	{
-		cout << "User " << username << " is not part of group chat '" << groupChat->getChatName() << "'." << endl;
-		return;
-	}
-
-	groupChat->addAdmin(user);
-	fileHandler->saveChatToFile(groupChat, getChatType(groupChat));
-
-	cout << "Successfully made user " << username << " admin of '" << groupChat->getChatName() << "'!" << endl;
-}
-
 void User::kickFromGroup(int chatId, const MyString& username) {
-	Chat* chat = findChatById(chatId, this->chats);
-
-	if (!chat)
-	{
-		cout << "You aren't in any group chat with id " << chatId << "." << endl;
-		return;
-	}
-
-	GroupChat* groupChat = dynamic_cast<GroupChat*>(chat);
+	GroupChat* groupChat = findGroupChatById(chatId, this->chats);
 
 	if (!groupChat)
 	{
@@ -520,22 +343,151 @@ void User::kickFromGroup(int chatId, const MyString& username) {
 	groupChat->removeParticipant(user);
 	groupChat->removeAdmin(user);
 
-	fileHandler->saveChatToFile(groupChat, getChatType(groupChat));
+	fileHandler->saveChatToFile(groupChat);
 	fileHandler->deleteUserChatRelation(username, chatId);
 
 	cout << "Successfully kicked user " << username << " from group chat '" << groupChat->getChatName() << "'!" << endl;
 }
 
-void User::checkGroupStats(int chatId) {
-	Chat* chat = findChatById(chatId, this->chats);
+void User::setGroupAdmin(int chatId, const MyString& username) {
+	GroupChat* groupChat = findGroupChatById(chatId, this->chats);
 
-	if (!chat)
+	if (!groupChat)
 	{
 		cout << "You aren't in any group chat with id " << chatId << "." << endl;
 		return;
 	}
 
-	GroupChat* groupChat = dynamic_cast<GroupChat*>(chat);
+	User* user = findUser(this->username, groupChat->getAdmins());
+
+	if (!user)
+	{
+		cout << "You are not an admin of group chat '"
+			<< groupChat->getChatName() << "'! Only group admins can make other participants admins." << endl;
+		return;
+	}
+
+	if (this->username == username)
+	{
+		cout << "You can't make yourself admin!" << endl;
+		return;
+	}
+
+	user = findUser(username, groupChat->getAdmins());
+
+	if (user)
+	{
+		cout << "User " << username << " is already an admin of group chat '" << groupChat->getChatName() << "'." << endl;
+		return;
+	}
+
+	user = findUser(username, groupChat->getParticipants());
+
+	if (!user)
+	{
+		cout << "User " << username << " is not part of group chat '" << groupChat->getChatName() << "'." << endl;
+		return;
+	}
+
+	groupChat->addAdmin(user);
+	fileHandler->saveChatToFile(groupChat);
+
+	cout << "Successfully made user " << username << " admin of '" << groupChat->getChatName() << "'!" << endl;
+}
+
+void User::toggleAddApproval(int chatId) {
+	GroupChat* groupChat = findGroupChatById(chatId, this->chats);
+
+	if (!groupChat)
+	{
+		cout << "You aren't in any group chat with id " << chatId << "." << endl;
+		return;
+	}
+
+	User* user = findUser(this->username, groupChat->getAdmins());
+
+	if (!user)
+	{
+		cout << "You are not an admin of group chat '"
+			<< groupChat->getChatName() << "'! Only group admins can turn on and off adding approval." << endl;
+		return;
+	}
+
+	groupChat->setApproval(!(groupChat->getRequiresApproval()));
+	fileHandler->saveChatToFile(groupChat);
+
+	if (groupChat->getRequiresApproval())
+	{
+		cout << "Group chat '" << groupChat->getChatName() << "' has enabled adding approval!" << endl;
+	}
+	else
+	{
+		cout << "Group chat '" << groupChat->getChatName() << "' has disabled adding approval!" << endl;
+	}
+}
+
+void User::viewAddRequests(int chatId) {
+	GroupChat* groupChat = findGroupChatById(chatId, chats);
+
+	if (!groupChat)
+	{
+		cout << "You aren't in any group chat with id " << chatId << "." << endl;
+		return;
+	}
+
+	cout << "Users awaiting approval in group chat '" << groupChat->getChatName() << "': ";
+
+	if (groupChat->getUsersAwaitingApproval().getSize() == 0)
+	{
+		cout << " None";
+	}
+
+	for (size_t i = 0; i < groupChat->getUsersAwaitingApproval().getSize(); i++)
+	{
+		cout << groupChat->getUsersAwaitingApproval()[i]->getUsername() << " ";
+	}
+
+	cout << endl;
+}
+
+void User::approveAddRequest(int chatId, const MyString& username) {
+	GroupChat* groupChat = findGroupChatById(chatId, this->chats);
+
+	if (!groupChat)
+	{
+		cout << "You aren't in any group chat with id " << chatId << "." << endl;
+		return;
+	}
+
+	User* user = findUser(this->username, groupChat->getAdmins());
+
+	if (!user)
+	{
+		cout << "You are not an admin of group chat '"
+			<< groupChat->getChatName() << "'! Only group admins can approve add requests." << endl;
+		return;
+	}
+
+	user = findUser(username, groupChat->getUsersAwaitingApproval());
+
+	if (!user)
+	{
+		cout << "User " << username << " is not in the group chat's awaiting approval list." << endl;
+		return;
+	}
+
+	groupChat->removeUserFromApprovalList(user);
+	user->addChat(groupChat);
+	groupChat->addParticipant(user);
+
+	fileHandler->deleteUserFromApprovaList(username, chatId);
+	fileHandler->saveUserChatToFile(user->getUsername(), chatId);
+
+	cout << "User " << username << " has been approved and was successfully added to the group chat!" << endl;
+}
+
+void User::checkGroupStats(int chatId) {
+	GroupChat* groupChat = findGroupChatById(chatId, this->chats);
 
 	if (!groupChat)
 	{
@@ -551,14 +503,15 @@ void User::checkGroupStats(int chatId) {
 		MyString topUser = groupChat->getParticipants()[0]->getUsername();
 		int topMessagesCount = groupChat->getMessageCount(topUser);
 
-		for (size_t i = 0; i < groupChat->getParticipants().getSize(); i++)
+		for (size_t i = 1; i < groupChat->getParticipants().getSize(); i++)
 		{
-			int curr = groupChat->getMessageCount(groupChat->getParticipants()[i]->getUsername());
+			MyString currentUser = groupChat->getParticipants()[i]->getUsername();
+			int currMessagesCount = groupChat->getMessageCount(currentUser);
 
-			if (curr > topMessagesCount)
+			if (currMessagesCount > topMessagesCount)
 			{
-				topMessagesCount = curr;
-				topUser = groupChat->getParticipants()[i]->getUsername();
+				topMessagesCount = currMessagesCount;
+				topUser = currentUser;
 			}
 		}
 
