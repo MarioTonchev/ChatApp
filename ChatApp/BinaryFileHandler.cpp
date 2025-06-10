@@ -31,7 +31,7 @@ MyString BinaryFileHandler::readMyStringBin(ifstream& is) {
 	return str;
 }
 
-void BinaryFileHandler::saveUserToFile(User* user, const MyString& userType) {
+void BinaryFileHandler::saveUserToFile(RegularUser* user) {
 	ofstream os(usersFileBin, ios::binary | ios::app);
 
 	if (!os.is_open())
@@ -39,16 +39,26 @@ void BinaryFileHandler::saveUserToFile(User* user, const MyString& userType) {
 		throw invalid_argument("File does not exist!");
 	}
 
-	writeMyStringBin(os, userType);
+	writeMyStringBin(os, "RegularUser");
 	writeMyStringBin(os, user->getUsername());
 	writeMyStringBin(os, user->getPassword());
 
-	if (userType == "Admin")
+	os.close();
+}
+void BinaryFileHandler::saveUserToFile(Admin* user) {
+	ofstream os(usersFileBin, ios::binary | ios::app);
+
+	if (!os.is_open())
 	{
-		Admin* admin = dynamic_cast<Admin*>(user);
-		int adminId = admin->getAdminId();
-		os.write((const char*)&adminId, sizeof(adminId));
+		throw invalid_argument("File does not exist!");
 	}
+
+	writeMyStringBin(os, "Admin");
+	writeMyStringBin(os, user->getUsername());
+	writeMyStringBin(os, user->getPassword());
+
+	int adminId = user->getAdminId();
+	os.write((const char*)&adminId, sizeof(adminId));
 
 	os.close();
 }
@@ -86,14 +96,14 @@ void BinaryFileHandler::loadUsers(MyVector<User*>& users) {
 	is.close();
 }
 
-void BinaryFileHandler::saveChatToFile(Chat* chat, const MyString& chatType) {
-	if (!chat)
+void BinaryFileHandler::saveChatToFile(IndividualChat* individualChat) {
+	if (!individualChat)
 	{
 		throw invalid_argument("Chat cannot be null!");
 	}
 
 	MyString file = chatsFile;
-	file += chat->getChatId();
+	file += individualChat->getChatId();
 	file += ".bin";
 
 	ofstream os(file.get(), ios::binary | ios::trunc);
@@ -103,34 +113,66 @@ void BinaryFileHandler::saveChatToFile(Chat* chat, const MyString& chatType) {
 		throw invalid_argument("Error: Could not open file for binary write");
 	}
 
-	writeMyStringBin(os, chatType);
+	writeMyStringBin(os, "IndividualChat");
 
-	int chatId = chat->getChatId();
+	int chatId = individualChat->getChatId();
 	os.write((const char*)&chatId, sizeof(chatId));
 
-	if (chatType == "GroupChat")
-	{
-		GroupChat* groupChat = dynamic_cast<GroupChat*>(chat);
-
-		writeMyStringBin(os, groupChat->getChatName());
-
-		int flag = groupChat->getRequiresApproval() ? 1 : 0;
-		os.write((char*)&flag, sizeof(flag));
-
-		int adminCount = groupChat->getAdmins().getSize();
-		os.write((char*)&adminCount, sizeof(adminCount));
-
-		for (int i = 0; i < adminCount; ++i) {
-			writeMyStringBin(os, groupChat->getAdmins()[i]->getUsername());
-		}
-	}
-
-	int messagesCount = chat->getMessages().getSize();
+	int messagesCount = individualChat->getMessages().getSize();
 	os.write((char*)&messagesCount, sizeof(messagesCount));
 
 	for (int i = 0; i < messagesCount; ++i)
 	{
-		const Message& message = chat->getMessages()[i];
+		const Message& message = individualChat->getMessages()[i];
+
+		writeMyStringBin(os, message.getSender());
+		writeMyStringBin(os, message.getContent());
+		writeMyStringBin(os, message.getDate());
+		writeMyStringBin(os, message.getTime());
+	}
+
+	os.close();
+}
+void BinaryFileHandler::saveChatToFile(GroupChat* groupChat) {
+	if (!groupChat)
+	{
+		throw invalid_argument("Chat cannot be null!");
+	}
+
+	MyString file = chatsFile;
+	file += groupChat->getChatId();
+	file += ".bin";
+
+	ofstream os(file.get(), ios::binary | ios::trunc);
+
+	if (!os.is_open())
+	{
+		throw invalid_argument("Error: Could not open file for binary write");
+	}
+
+	writeMyStringBin(os, "GroupChat");
+
+	int chatId = groupChat->getChatId();
+	os.write((const char*)&chatId, sizeof(chatId));
+
+	writeMyStringBin(os, groupChat->getChatName());
+
+	int requiresApproval = groupChat->getRequiresApproval() ? 1 : 0;
+	os.write((const char*)&requiresApproval, sizeof(requiresApproval));
+
+	int adminCount = groupChat->getAdmins().getSize();
+	os.write((const char*)&adminCount, sizeof(adminCount));
+
+	for (int i = 0; i < adminCount; ++i) {
+		writeMyStringBin(os, groupChat->getAdmins()[i]->getUsername());
+	}
+
+	int messagesCount = groupChat->getMessages().getSize();
+	os.write((const char*)&messagesCount, sizeof(messagesCount));
+
+	for (int i = 0; i < messagesCount; ++i)
+	{
+		const Message& message = groupChat->getMessages()[i];
 
 		writeMyStringBin(os, message.getSender());
 		writeMyStringBin(os, message.getContent());
@@ -167,13 +209,13 @@ void BinaryFileHandler::loadChats(MyVector<Chat*>& chats, MyVector<User*>& users
 		{
 			MyString name = readMyStringBin(is);
 
-			int flag = 0;
-			is.read((char*)&flag, sizeof(flag));
+			int requiresApproval = 0;
+			is.read((char*)&requiresApproval, sizeof(requiresApproval));
 
 			int adminsCount = 0;
 			is.read((char*)&adminsCount, sizeof(adminsCount));
 
-			chat = new GroupChat(chatId, name, flag);
+			chat = new GroupChat(chatId, name, requiresApproval);
 
 			for (int i = 0; i < adminsCount; ++i) {
 				MyString username = readMyStringBin(is);

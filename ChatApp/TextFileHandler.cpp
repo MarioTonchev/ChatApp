@@ -6,7 +6,7 @@
 
 using namespace std;
 
-void TextFileHandler::saveUserToFile(User* user, const MyString& userType) {
+void TextFileHandler::saveUserToFile(RegularUser* user) {
 	ofstream os(usersFile, ios::app);
 
 	if (!os.is_open())
@@ -14,17 +14,19 @@ void TextFileHandler::saveUserToFile(User* user, const MyString& userType) {
 		throw invalid_argument("Error: Could not open file!");
 	}
 
-	os << userType << "|";
+	os << "RegularUser" << "|" << user->getUsername() << "|" << user->getPassword() << endl;
 
-	os << user->getUsername() << "|" << user->getPassword();
+	os.close();
+}
+void TextFileHandler::saveUserToFile(Admin* user) {
+	ofstream os(usersFile, ios::app);
 
-	if (userType == "Admin")
+	if (!os.is_open())
 	{
-		Admin* admin = dynamic_cast<Admin*>(user);
-		os << "|" << admin->getAdminId();
+		throw invalid_argument("Error: Could not open file!");
 	}
 
-	os << endl;
+	os << "Admin" << "|" << user->getUsername() << "|" << user->getPassword() << "|" << user->getAdminId() << endl;
 
 	os.close();
 }
@@ -57,14 +59,14 @@ void TextFileHandler::loadUsers(MyVector<User*>& users) {
 	is.close();
 }
 
-void TextFileHandler::saveChatToFile(Chat* chat, const MyString& chatType) {
-	if (!chat)
+void TextFileHandler::saveChatToFile(IndividualChat* individualChat) {
+	if (!individualChat)
 	{
 		throw invalid_argument("Chat cannot be null!");
 	}
 
 	MyString fileName = chatsFile;
-	fileName += chat->getChatId();
+	fileName += individualChat->getChatId();
 	fileName += ".txt";
 
 	ofstream os(fileName.get());
@@ -74,39 +76,57 @@ void TextFileHandler::saveChatToFile(Chat* chat, const MyString& chatType) {
 		throw invalid_argument("Error: Could not open file!");
 	}
 
-	if (chatType == "GroupChat")
+	os << "IndividualChat" << "|" << individualChat->getChatId() << endl;
+
+	for (size_t i = 0; i < individualChat->getMessages().getSize(); i++)
 	{
-		GroupChat* groupChat = dynamic_cast<GroupChat*>(chat);
-
-		os << "GroupChat" << "|" << chat->getChatId() << "|"
-			<< groupChat->getChatName() << "|" << groupChat->getRequiresApproval() << "|";
-
-		if (groupChat->getAdmins().getSize() == 0)
-		{
-			os << "noadmins" << endl;
-		}
-
-		for (size_t i = 0; i < groupChat->getAdmins().getSize(); i++)
-		{
-			if (i < groupChat->getAdmins().getSize() - 1)
-			{
-				os << groupChat->getAdmins()[i]->getUsername() << ",";
-			}
-			else
-			{
-				os << groupChat->getAdmins()[i]->getUsername() << endl;
-			}
-		}
-	}
-	else
-	{
-		os << "IndividualChat" << "|" << chat->getChatId() << endl;
+		os << individualChat->getMessages()[i].getSender() << "|" << individualChat->getMessages()[i].getContent() << "|"
+			<< individualChat->getMessages()[i].getDate() << "|" << individualChat->getMessages()[i].getTime() << endl;
 	}
 
-	for (size_t i = 0; i < chat->getMessages().getSize(); i++)
+	os.close();
+}
+void TextFileHandler::saveChatToFile(GroupChat* groupChat) {
+	if (!groupChat)
 	{
-		os << chat->getMessages()[i].getSender() << "|" << chat->getMessages()[i].getContent() << "|"
-			<< chat->getMessages()[i].getDate() << "|" << chat->getMessages()[i].getTime() << endl;
+		throw invalid_argument("Chat cannot be null!");
+	}
+
+	MyString fileName = chatsFile;
+	fileName += groupChat->getChatId();
+	fileName += ".txt";
+
+	ofstream os(fileName.get());
+
+	if (!os.is_open())
+	{
+		throw invalid_argument("Error: Could not open file!");
+	}
+
+	os << "GroupChat" << "|" << groupChat->getChatId() << "|"
+		<< groupChat->getChatName() << "|" << groupChat->getRequiresApproval() << "|";
+
+	if (groupChat->getAdmins().getSize() == 0)
+	{
+		os << "noadmins" << endl;
+	}
+
+	for (size_t i = 0; i < groupChat->getAdmins().getSize(); i++)
+	{
+		if (i < groupChat->getAdmins().getSize() - 1)
+		{
+			os << groupChat->getAdmins()[i]->getUsername() << ",";
+		}
+		else
+		{
+			os << groupChat->getAdmins()[i]->getUsername() << endl;
+		}
+	}
+
+	for (size_t i = 0; i < groupChat->getMessages().getSize(); i++)
+	{
+		os << groupChat->getMessages()[i].getSender() << "|" << groupChat->getMessages()[i].getContent() << "|"
+			<< groupChat->getMessages()[i].getDate() << "|" << groupChat->getMessages()[i].getTime() << endl;
 	}
 
 	os.close();

@@ -2,21 +2,24 @@
 
 #include "User.h"
 #include "RegularUser.h"
-#include "Admin.h"
 #include "MyString.h"
 #include "MyVector.hpp"
 #include "UserUtils.h"
 #include "ChatUtils.h"
 #include "FileConstants.h"
 
+class Admin;
+
 class FileHandler {
 public:
 	virtual ~FileHandler() = default;
 	
-	virtual void saveUserToFile(User* user, const MyString& userType) = 0;
+	virtual void saveUserToFile(RegularUser* user) = 0;
+	virtual void saveUserToFile(Admin* user) = 0;
 	virtual void loadUsers(MyVector<User*>& users) = 0;
 
-	virtual void saveChatToFile(Chat* chat, const MyString& chatType) = 0;
+	virtual void saveChatToFile(IndividualChat* individualChat) = 0;
+	virtual void saveChatToFile(GroupChat* groupChat) = 0;
 	virtual void loadChats(MyVector<Chat*>& chats, MyVector<User*>& users) = 0;
 
 	virtual void saveChatIdToFile(Chat* chat) = 0;

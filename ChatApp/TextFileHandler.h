@@ -1,13 +1,16 @@
 #pragma once
 
 #include "FileHandler.h"
+#include "Admin.h"
 
 class TextFileHandler : public FileHandler {
 public:
-	void saveUserToFile(User* user, const MyString& userType) override;
+	void saveUserToFile(RegularUser* user) override;
+	void saveUserToFile(Admin* user) override;
 	void loadUsers(MyVector<User*>& users) override;
 
-	void saveChatToFile(Chat* chat, const MyString& chatType) override;
+	void saveChatToFile(IndividualChat* individualChat) override;
+	void saveChatToFile(GroupChat* groupChat) override;
 	void loadChats(MyVector<Chat*>& chats, MyVector<User*>& users) override;
 
 	void saveChatIdToFile(Chat* chat) override;
