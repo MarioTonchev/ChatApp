@@ -57,6 +57,10 @@ void Application::run() {
 			{
 				break;
 			}
+			else 
+			{
+				cout << "Invalid command!" << endl;
+			}
 		}
 		else
 		{
@@ -193,6 +197,10 @@ void Application::run() {
 			else if (action == "quit")
 			{
 				break;
+			}
+			else
+			{
+				cout << "Invalid command!" << endl;
 			}
 		}
 	}
