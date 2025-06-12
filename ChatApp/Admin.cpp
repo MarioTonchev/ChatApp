@@ -61,16 +61,17 @@ void Admin::deleteUser(const MyString& username, MyVector<User*>& users, MyVecto
 
 		if (currChat->getParticipants().getSize() == 0)
 		{
-			deleteChat(currChat, chats, fileHandler);
 			cout << "Group chat with id " << currChat->getChatId()
 				<< " was deleted because it had 0 users left!" << endl;
+
+			deleteChat(currChat, chats, fileHandler);
 		}
 		else if (chatType == "IndividualChat" && currChat->getParticipants().getSize() == 1)
 		{
-			deleteChat(currChat, chats, fileHandler);
-
 			cout << "Individual chat with id " << currChat->getChatId()
 				<< " was deleted because it had only 1 user left!" << endl;
+
+			deleteChat(currChat, chats, fileHandler);
 		}
 		else
 		{
@@ -110,9 +111,9 @@ void Admin::deleteGroupChat(int chatId, MyVector<Chat*>& chats) {
 		return;
 	}
 
-	deleteChat(groupChat, chats, fileHandler);
-
 	cout << "Group chat with id " << chatId << " has been successfully deleted!" << endl;
+
+	deleteChat(groupChat, chats, fileHandler);
 }
 
 void Admin::viewAllChats(MyVector<Chat*>& chats) const {

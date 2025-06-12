@@ -232,10 +232,10 @@ void User::leaveGroupChat(int chatId, MyVector<Chat*>& chats) {
 
 		cout << "You successfully left chat with id " << chatId << "." << endl;
 
-		deleteChat(groupChat, chats, fileHandler);
-
 		cout << "Group chat with id " << groupChat->getChatId()
 			<< " was deleted because it had 0 users left!" << endl;
+
+		deleteChat(groupChat, chats, fileHandler);
 
 		return;
 	}
